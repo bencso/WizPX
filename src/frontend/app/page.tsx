@@ -57,7 +57,15 @@ export default function Page() {
   }, [selectedImg, sessionData]);
 
   return (
-    <Flex h={"100vh"} direction={isMd ? "row" : "column"} w={"full"}>
+    <Flex
+      h={"100vh"}
+      direction={isMd ? "row" : "column"}
+      w={"full"}
+      display={"flex"}
+      justifyContent={"center"}
+      alignItems={"center"}
+      alignContent={"center"}
+    >
       <LeftSide />
       <Flex flex={1} w="full" h={"100vh"} minH={"0"} direction="column">
         <Flex
@@ -67,11 +75,22 @@ export default function Page() {
           flex={1}
           bg={"bg.muted/30"}
           direction={isMd ? "row" : "column"}
+          display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
+          alignContent={"center"}
         >
           {sessionData.length > 0 && isEditor && <ImagesSide />}
-          <Box h={"full"} w={"full"} p={4} boxSizing={"border-box"}>
+          <Box
+            h={"full"}
+            w={"full"}
+            p={4}
+            boxSizing={"border-box"}
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            alignContent={"center"}
+          >
             {step === 0 && <UploadImageBlock />}
             {step === 1 && selectedImage && <ImageWorkPlace />}
           </Box>

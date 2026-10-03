@@ -131,8 +131,9 @@ export default function ImageWorkPlace() {
         h={"full"}
         w={"full"}
         boxSizing={"border-box"}
-        justifyContent={"center"}
-        alignItems={"start"}
+         display={"flex"}   justifyContent={"center"}
+          alignItems={"center"}
+          alignContent={"center"}
         flexDir={!isMd ? "column" : "row"}
         gap={12}
         mx={"auto"}

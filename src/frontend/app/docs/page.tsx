@@ -66,7 +66,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function StepList({ items }: { items: { title: string; description: string }[] }) {
   return (
-    <Steps.Root orientation="vertical" count={items.length} linear={false} defaultStep={0}>
+    <Steps.Root variant={"subtle"} orientation="vertical"  count={items.length} linear={false} defaultStep={-1}>
       <Steps.List>
         {items.map((step, index) => (
           <Steps.Item key={step.title} index={index} title={step.title}>

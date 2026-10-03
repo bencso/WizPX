@@ -23,7 +23,6 @@ import { allFiltersFragment } from "@/handlers/filters/allFiltersFragment";
 import { getChannelOffsets } from "@/helper/lut/getChannelOffset";
 import { filters } from "@/interfaces/filters.interface";
 import { maskFiltersFragment } from "@/handlers/filters/maskFiltersFragment";
-import { previewScale } from "@/interfaces/workplaceHelper.interface";
 
 //#region SIDEBAR ITEM
 export const MaskLayerBlock = () => {
@@ -33,7 +32,7 @@ export const MaskLayerBlock = () => {
     <Popover.Root
       open={open}
       onOpenChange={(e) => setOpen(e.open)}
-      positioning={{ placement: "bottom-start" }}
+      positioning={{ placement: "bottom" }}
     >
       <Popover.Trigger
         asChild
