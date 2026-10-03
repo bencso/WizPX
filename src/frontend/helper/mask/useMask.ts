@@ -332,8 +332,14 @@ export const useMask = (props: createMaskProps) => {
 
     if (!maskTex) return;
 
+    // A temporary textúra kép méretű, a maszkba 1:1-ben kell beleírni: az előnézethez
+    // beállított skálát / pozíciót a commit előtt vissza kell állítani
+    const temporarySprite = current.temporarySpriteRef.current;
+    temporarySprite.scale.set(1);
+    temporarySprite.position.set(0, 0);
+
     appRef.current?.renderer.render({
-      container: current.temporarySpriteRef.current,
+      container: temporarySprite,
       target: maskTex,
       clear: false,
     });
