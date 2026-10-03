@@ -142,6 +142,29 @@ export const useMask = (props: createMaskProps) => {
 
   //TODO: Még annyit lehetne hogy a kép ne teljese res-be legyen és a performance egész jó lehet
 
+  // Az alapréteg (0) a globális szűrőké, arra nem lehet maszkot rajzolni
+  function canDraw() {
+    const layer = latestRef.current.selectedLayer;
+    return layer !== null && layer !== 0;
+  }
+
+  // Stage koordináta -> kép koordináta leképezés a megjelenített fő sprite alapján
+  // (skála + a sprite bal felső sarka a stage-en)
+  function getMapping() {
+    const sprite = props.spriteRef.current;
+
+    if (!sprite || sprite.scale.x === 0)
+      return { scale: latestRef.current.scale, offsetX: 0, offsetY: 0 };
+
+    const scale = Math.abs(sprite.scale.x);
+
+    return {
+      scale,
+      offsetX: sprite.x - sprite.width * sprite.anchor.x,
+      offsetY: sprite.y - sprite.height * sprite.anchor.y,
+    };
+  }
+
   // A drága stage render legfeljebb PREVIEW_INTERVAL_MS-onként fut, a végén mindig lefut még egyszer
   function schedulePreview() {
     if (previewTimer.current !== null) return;
@@ -189,7 +212,13 @@ export const useMask = (props: createMaskProps) => {
 
     const container = batchContainerRef.current;
     const pool = spritePoolRef.current;
-    const brushScale = current.brushSize / current.scale / 100;
+    const { scale, offsetX, offsetY } = getMapping();
+    const brushScale = current.brushSize / scale / 100;
+
+    // az előnézet sprite a kép méretű textúrát a megjelenített képre illeszti
+    const preview = current.temporarySpriteRef.current;
+    preview.scale.set(scale);
+    preview.position.set(offsetX, offsetY);
     const blendMode = current.maskErase ? "erase" : "normal";
 
     for (let i = 0; i < queue.length; i++) {
@@ -197,11 +226,16 @@ export const useMask = (props: createMaskProps) => {
 
       if (!sprite) {
         sprite = new Sprite();
+        // a kefe közepe legyen az egér alatt
+        sprite.anchor.set(0.5);
         pool[i] = sprite;
       }
 
       sprite.texture = current.brushTexture;
-      sprite.position.set(queue[i].x / current.scale, queue[i].y / current.scale);
+      sprite.position.set(
+        (queue[i].x - offsetX) / scale,
+        (queue[i].y - offsetY) / scale,
+      );
       sprite.scale.set(brushScale);
       sprite.blendMode = blendMode;
 
@@ -265,7 +299,7 @@ export const useMask = (props: createMaskProps) => {
     const localPos = e.global;
 
     if (!localPos || !drawingRef.current) return;
-    if (latestRef.current.selectedLayer === null) return;
+    if (!canDraw()) return;
 
     addStroke(localPos.x, localPos.y);
 
@@ -331,7 +365,7 @@ export const useMask = (props: createMaskProps) => {
 
     const current = latestRef.current;
 
-    if (current.selectedLayer === null) return;
+    if (!canDraw()) return;
 
     drawingRef.current = true;
     props.setIsDrawing(true);
