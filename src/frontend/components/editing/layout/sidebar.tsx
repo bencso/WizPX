@@ -844,37 +844,63 @@ export default function SideBar() {
       px={isMd ? 0 : 2}
       justifyContent={"center"}
     >
-      <ScrollArea.Root maxH={isMd ? "80%" : "fit"} maxW={isMd ? "fit" : "100%"}>
-        <ScrollArea.Viewport
-          css={{
-            "--scroll-shadow-size": "4rem",
-            maskImage: "linear-gradient(#000, #000)",
-            "&[data-overflow-y]": {
-              maskImage:
-                "linear-gradient(to bottom, transparent, #000 var(--scroll-shadow-size), #000 calc(100% - var(--scroll-shadow-size)), transparent)",
-              "&[data-at-top]": {
-                maskImage:
-                  "linear-gradient(180deg, #000 calc(100% - var(--scroll-shadow-size)), transparent)",
+      <ScrollArea.Root
+        maxH={isMd ? "80%" : "fit"}
+        maxW={isMd ? "fit" : "100%"}
+        css={{
+          "--scroll-shadow-size": "4rem",
+          position: "relative",
+          // Mask helyett pointer-events nélküli átmenetek: a mask minden
+          // újrafestésnél (pl. csúszka húzás) újrarasztereli a tartalmat.
+          "&::before, &::after": {
+            content: '""',
+            position: "absolute",
+            pointerEvents: "none",
+            zIndex: 1,
+            opacity: 0,
+            transition: "opacity 0.15s",
+          },
+          "&::before": isMd
+            ? {
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "var(--scroll-shadow-size)",
+                background:
+                  "linear-gradient(to bottom, var(--chakra-colors-bg), transparent)",
+              }
+            : {
+                top: 0,
+                bottom: 0,
+                left: 0,
+                width: "var(--scroll-shadow-size)",
+                background:
+                  "linear-gradient(to right, var(--chakra-colors-bg), transparent)",
               },
-              "&[data-at-bottom]": {
-                maskImage:
-                  "linear-gradient(0deg, #000 calc(100% - var(--scroll-shadow-size)), transparent)",
+          "&::after": isMd
+            ? {
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "var(--scroll-shadow-size)",
+                background:
+                  "linear-gradient(to top, var(--chakra-colors-bg), transparent)",
+              }
+            : {
+                top: 0,
+                bottom: 0,
+                right: 0,
+                width: "var(--scroll-shadow-size)",
+                background:
+                  "linear-gradient(to left, var(--chakra-colors-bg), transparent)",
               },
-            },
-            "&[data-overflow-x]": {
-              maskImage:
-                "linear-gradient(to right, transparent, #000 var(--scroll-shadow-size), #000 calc(100% - var(--scroll-shadow-size)), transparent)",
-              "&[data-at-left]": {
-                maskImage:
-                  "linear-gradient(90deg, #000 calc(100% - var(--scroll-shadow-size)), transparent)",
-              },
-              "&[data-at-right]": {
-                maskImage:
-                  "linear-gradient(-90deg, #000 calc(100% - var(--scroll-shadow-size)), transparent)",
-              },
-            },
-          }}
-        >
+          "&:has([data-overflow-y]:not([data-at-top]))::before, &:has([data-overflow-x]:not([data-at-left]))::before":
+            { opacity: 1 },
+          "&:has([data-overflow-y]:not([data-at-bottom]))::after, &:has([data-overflow-x]:not([data-at-right]))::after":
+            { opacity: 1 },
+        }}
+      >
+        <ScrollArea.Viewport>
           <ScrollArea.Content p={2} boxSizing={"border-box"} w={"fit"}>
             <Flex flexDir={isMd ? "column" : "row"} gap={2}>
               {editItems.map((item, index) => (

@@ -363,22 +363,22 @@ export default function CaptionBlock() {
             size="xs"
             scrollbar="hidden"
             alignItems={"center"}
+            css={{
+              position: "relative",
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                right: 0,
+                width: "3rem",
+                pointerEvents: "none",
+                background:
+                  "linear-gradient(to left, var(--chakra-colors-bg), transparent)",
+              },
+            }}
           >
-            <ScrollArea.Viewport
-              css={{
-                "--scroll-shadow-size": "3rem",
-                maskImage: "linear-gradient(to right, #000 85%, transparent)",
-                "&[data-at-top=false]": {
-                  maskImage: "linear-gradient(to right, #000 85%, transparent)",
-                },
-                "&[data-at-bottom=false]": {
-                  maskImage: "linear-gradient(to right, #000 85%, transparent)",
-                },
-                "&[data-at-top=true][data-at-bottom=true]": {
-                  maskImage: "linear-gradient(to right, #000, #000)",
-                },
-              }}
-            >
+            <ScrollArea.Viewport>
               <ScrollArea.Content>
                 <Flex gap="1.5" flexWrap="nowrap" align="center" py="1">
                   {tags.map((tag, index) => (
