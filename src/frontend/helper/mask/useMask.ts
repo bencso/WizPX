@@ -75,6 +75,7 @@ export const useMask = (props: createMaskProps) => {
   // setIsDrawing aszinkron, ezért a pointer eseményekhez szinkron jelző kell
   const drawingRef = useRef(false);
   const batchContainerRef = useRef<Container | null>(null);
+  const commitSpriteRef = useRef<Sprite | null>(null);
   const spritePoolRef = useRef<Sprite[]>([]);
   const emptyContainerRef = useRef<Container | null>(null);
 
@@ -332,14 +333,16 @@ export const useMask = (props: createMaskProps) => {
 
     if (!maskTex) return;
 
-    // A temporary textúra kép méretű, a maszkba 1:1-ben kell beleírni: az előnézethez
-    // beállított skálát / pozíciót a commit előtt vissza kell állítani
-    const temporarySprite = current.temporarySpriteRef.current;
-    temporarySprite.scale.set(1);
-    temporarySprite.position.set(0, 0);
+    // A temporary textúra kép méretű, a maszkba 1:1-ben kell beleírni. Az előnézet sprite a stage-en
+    // van (skálázva / eltolva, és a Pixi a stage-es világtranszformját használja), ezért a commit
+    // egy külön, a stage-en kívüli sprite-tal történik, aminek a transzformja mindig egységnyi
+    if (!commitSpriteRef.current) commitSpriteRef.current = new Sprite();
+
+    const commitSprite = commitSpriteRef.current;
+    commitSprite.texture = current.temporarySpriteRef.current.texture;
 
     appRef.current?.renderer.render({
-      container: temporarySprite,
+      container: commitSprite,
       target: maskTex,
       clear: false,
     });

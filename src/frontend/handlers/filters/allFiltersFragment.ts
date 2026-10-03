@@ -10,6 +10,10 @@ export const allFiltersFragment = `#version 300 es
 
     in vec2 vTextureCoord; 
     uniform sampler2D uTexture;
+    // Pixi a szűrő input textúráját 2 hatványára kerekítheti, ilyenkor a vTextureCoord csak az
+    // input textúra egy részét fedi le, a layer_mask viszont pontosan kép méretű
+    uniform vec4 uInputSize;
+    uniform vec4 uOutputFrame;
     
     uniform float exposure_input;
     uniform float brightness_input;
@@ -72,7 +76,8 @@ export const allFiltersFragment = `#version 300 es
 
     vec4 filtered = vec4(rgb, current.a);
 
-    float lm = texture(layer_mask, vTextureCoord).a;
+    vec2 maskUV = vTextureCoord * uInputSize.xy / uOutputFrame.zw;
+    float lm = texture(layer_mask, maskUV).a;
 
     finalColor = mix(current, filtered, lm);
     }
