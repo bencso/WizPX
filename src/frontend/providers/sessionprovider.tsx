@@ -51,7 +51,8 @@ export function WorkSessionProvider({ children }: WorkSessionProviderProps) {
   const webglFilterRef = useRef<Filter | null>(null);
   const lutFilterRef = useRef<ColorMapFilter | null>(null);
   const overlayRef = useRef<Container | null>(null);
-  const renderSpriteRef = useRef(new Sprite());
+  const renderSpriteRef = useRef<Sprite>(null as unknown as Sprite);
+  if (!renderSpriteRef.current) renderSpriteRef.current = new Sprite();
 
   const [selectedLayer, setSelectLayer] = useState<number | null>(0);
   const maskTextureRef = useRef<RenderTexture | null>(null);
@@ -63,8 +64,8 @@ export function WorkSessionProvider({ children }: WorkSessionProviderProps) {
   const [maskSharpness, setMaskSharpness] = useState<number>(0);
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
 
-  const temporarySprite = new Sprite();
-  const temporarySpriteRef = useRef<Sprite>(temporarySprite);
+  const temporarySpriteRef = useRef<Sprite>(null as unknown as Sprite);
+  if (!temporarySpriteRef.current) temporarySpriteRef.current = new Sprite();
 
   const [selectedChannel, setSelectedChannel] = useState<string>("red");
   const { functions, editFunction } = useFunctionsStore();

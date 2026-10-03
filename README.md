@@ -31,8 +31,11 @@ Az **WizPX** segítségével a fotósok *percek alatt* közösségi médiára k�
 - EXIF adatokból caption-ök generálása *(késöbb a szövegnél is elérhető lesz)*
 
 #### Szerkesztés
-- Fényerő / kontraszt / stb.
+- Expozíció / fényerő / kontraszt / színhőmérséklet / tint / telítettség / vibrance (bőrtónus védelemmel) / hue / levels / gamma
+- Channel mixer
 - LUT
+- **Maszkolás:** rétegenként egérrel rajzolt (puha szélű) maszk, a szűrők csak a maszkolt területre hatnak
+- Átméretezés, szöveg, vízjel
 
 #### Export
 - Vízjel
@@ -52,8 +55,9 @@ Az **WizPX** segítségével a fotósok *percek alatt* közösségi médiára k�
 |:---------------:|:---------------------------------------------------------------:|:---------------------------------------------:|
 | *Frontend*      | ![nextjs](https://www.readmecodegen.com/api/social-icon?name=nextjs&size=40&shape=circle&reverseBackground=true&textAlignment=horizontal&showText=true&textColor=%237e7f7f) | Gyors, reszponzív UI komponensek React alapokon |
 | *UI library*    | ![chakraui](https://www.readmecodegen.com/api/social-icon?name=chakraui&size=40&shape=circle&reverseBackground=true&textAlignment=horizontal&showText=true&textColor=%237e7f7f) |  |
-| *Backend*       | ![fastapi](https://www.readmecodegen.com/api/social-icon?name=fastapi&size=40&shape=circle&reverseBackground=true&textAlignment=horizontal&showText=true&textColor=%237e7f7f) | Modern Python REST API, gyors és skálázható     |
-| *Architektúra*  | ![docker](https://www.readmecodegen.com/api/social-icon?name=docker&size=40&shape=circle&reverseBackground=true&textAlignment=horizontal&showText=true&textColor=%237e7f7f) | Könnyen telepíthető, konténerezett környezet    |
+| *Képfeldolgozás (böngésző)* | Pixi.js (WebGL / GLSL) | Valós idejű szűrők és maszkok GPU-n |
+| *Backend*       | ![fastapi](https://www.readmecodegen.com/api/social-icon?name=fastapi&size=40&shape=circle&reverseBackground=true&textAlignment=horizontal&showText=true&textColor=%237e7f7f) | Modern Python REST API, az exportált kép előállítása (pyvips + Pillow) |
+| *Futtatás*      | ![docker](https://www.readmecodegen.com/api/social-icon?name=docker&size=40&shape=circle&reverseBackground=true&textAlignment=horizontal&showText=true&textColor=%237e7f7f) | Könnyen telepíthető, konténerezett környezet    |
 
 <p align="right"><a href="#top">Vissza a tetejére</a></p>
 
@@ -110,7 +114,8 @@ flowchart LR
 | Vízjel | ✅ Kész |
 | Cropolás / Expandolás | ✅ Kész |
 | Képkeret funkció | ✅ Kész |
-| Szerkesztés | 🟡 Folyamatban |
+| Szerkesztés (szűrők, channel mixer) | ✅ Kész |
+| Maszkolás (rajzolt maszk rétegek) | 🟡 Folyamatban (teljesítmény optimalizálás) |
 | LUT használata / készítése | 🟡 Folyamatban |
 
 <p align="right"><a href="#top">Vissza a tetejére</a></p>
@@ -131,29 +136,19 @@ flowchart LR
  subgraph Backend["Backend"]
         API["Python FastAPI"]
   end
- subgraph s1["Adatbázis"]
-        Postgres[("PostgreSQL")]
-  end
- subgraph s2["Tárolás"]
-        FájlTárolás["Docker Volume"]
-  end
  subgraph subGraph4["Docker Hálózat"]
-        Nginx["Nginx Reverse Proxy + Statikus szerverek"]
+        Nginx["Nginx Reverse Proxy"]
         Frontend
         Backend
-        s1
-        s2
   end
-    User["Felhasználó / Böngésző"] -- HTTP/HTTPS --> Nginx
+    User["Felhasználó / Böngésző"] -- HTTP --> Nginx
     Nginx -- / --> NextJS
     Nginx -- /api --> API
-    Nginx -- /images --> FájlTárolás
-    API -- ORM --> Postgres
-    API -- Fájl mentés / olvasás --> FájlTárolás
-    NextJS -- API hívások --> API
-
-    FájlTárolás@{ shape: db}
+    NextJS -- "Export: eredeti kép + paraméterek + maszkok" --> API
+    API -- "pyvips / Pillow" --> Export["Exportált kép"]
 ```
+
+> A szerkesztés előnézete teljesen a böngészőben (Pixi.js / WebGL) fut. A backend állapotmentes, nincs adatbázis és nincs tartós fájltárolás: az exportálásnál a kép és a szerkesztési paraméterek (szűrők, LUT, maszkok, szöveg, vízjel, keret) érkeznek meg, és a kész kép megy vissza válaszként.
 
 <p align="right"><a href="#top">Vissza a tetejére</a></p>
 

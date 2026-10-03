@@ -7,12 +7,12 @@
   <h2>Gyorsítsd fel a fotós workflow-d!</h2>
   <p><em>EXIF adatok kinyerése és manipulálása, képszerkesztés és közösségi médiára felkészítés egy helyen.</em></p>
 <p align="center">
-  <a href="/README.md/#technológiák">Technológiák</a> |
-  <a href="/README.md/##roadmap">Roadmap</a> |
-  <a href="/README.md/##architektúra">Architektúra</a> |
+  <a href="/README.md#technológiák">Technológiák</a> |
+  <a href="/README.md#roadmap">Roadmap</a> |
+  <a href="/README.md#architektúra">Architektúra</a> |
   <a href="/docs/START_DEV.md"><strong>Első indítás (Fejlesztői)</strong></a> |
-  <a href="/README.md/#screenshot">Screenshot</a> |
-  <a href="/README.md/#közreműködés">Közreműködés</a> |
+  <a href="/README.md#screenshot">Screenshot</a> |
+  <a href="/README.md#közreműködés">Közreműködés</a> |
 </p>
 </div>
 
@@ -20,70 +20,65 @@
 
 ## Első indítás - Dev setup
 
+### Követelmények
+
+- Docker + Docker Compose
+
 ### 0. GitHub Repository leklónozása
 
 ```bash
 git clone https://github.com/bencso/WizPX.git
-cd WizPX
+cd WizPX/src
 ```
+
+> [!NOTE]
+> Minden további parancsot a `src/` mappából kell futtatni, itt van a `compose.yml`.
 
 ### 1. `.env` fájlok létrehozása
 
-```bash
-cp ./db/.env.example ./db/.env
-cp ./frontend/.env.example ./frontend/.env
-cp ./backend/.env.example ./backend/.env
-```
+A `compose.yml` mindkét szolgáltatásnál `env_file`-t vár, ezért a fájloknak léteznie kell. Jelenleg a kód nem olvas környezeti változókat, így üres fájl is elég:
 
-- Ezek után állítsd be az `.env` fájlok-ban a szükséges adatokat!
+```bash
+touch ./frontend/.env ./backend/.env
+```
 
 ---
 
 ### 2. Build + indítás
 
 ```bash
-docker compose -f compose.dev.yml up --build
+docker compose up --build
 ```
 
 - A `--build` mindig újraépíti a frontend és backend image-eket.
-- Ha csak a kód változik, de a Dockerfile nem, elég lehet az alábbi parancs:
+- Ha csak a kód változik, de a Dockerfile nem, elég az alábbi parancs:
 
 ```bash
-docker compose -f compose.dev.yml up
+docker compose up
 ```
 
 ---
 
 ### 3. Elérés
 
-| Szolgáltatás | URL                                                        |
-| ------------ | ---------------------------------------------------------- |
-| Frontend     | [http://localhost](http://localhost)                       |
-| Backend API  | [http://localhost/api](http://localhost/api)               |
-| pgAdmin      | [http://localhost:5050](http://localhost:5050)             |
-
-> [!NOTE]
-> pgAdmin login: `.env`-ben megadott felhasználó/jelszó.
+| Szolgáltatás | URL                                                  |
+| ------------ | ---------------------------------------------------- |
+| Frontend (nginx-en keresztül) | [http://localhost](http://localhost) |
+| Frontend (közvetlenül)        | [http://localhost:3000](http://localhost:3000) |
+| Backend API  | [http://localhost/api](http://localhost/api)         |
+| Backend státusz | [http://localhost/api/status](http://localhost/api/status) |
 
 ---
 
 ### 4. Konténerek állapotának ellenőrzése
 
 ```bash
-docker compose -f compose.dev.yml ps
-docker compose -f compose.dev.yml logs -f
-```
-
----
-
-- Ha módosítod a Dockerfile-t, újra kell buildelni:
-
-```bash
-docker compose -f compose.dev.yml up --build
+docker compose ps
+docker compose logs -f
 ```
 
 > [!NOTE]
-> Kódfrissítéshez **volumes miatt** nem kell újra buildelni.
+> Kódfrissítéshez **volumes miatt** nem kell újra buildelni. Dockerfile vagy `package.json` / `requirements.txt` módosítása után viszont igen (`docker compose up --build`).
 
 ---
 
@@ -91,8 +86,30 @@ docker compose -f compose.dev.yml up --build
 
 ```bash
 # Leállítás és network törlés
-docker compose -f compose.dev.yml down
+docker compose down
 
 # Csak újraindítás (network és volumes megmarad)
-docker compose -f compose.dev.yml restart
+docker compose restart
 ```
+
+---
+
+### Futtatás Docker nélkül (opcionális)
+
+**Frontend**
+
+```bash
+cd src/frontend
+npm install
+npm run dev
+```
+
+**Backend** (Python 3.14, `libvips` szükséges)
+
+```bash
+cd src/backend
+pip install -r requirements.txt
+uvicorn main:app --reload --port 3001
+```
+
+Ebben az esetben az nginx nincs a háttérben, ezért a frontendnek a `/api` útvonalat külön kell a backendre irányítani.

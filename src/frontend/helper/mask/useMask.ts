@@ -19,6 +19,7 @@ import {
   useRef,
 } from "react";
 import { CustomImage } from "@/interfaces/interface";
+import { Points } from "@/interfaces/mask.interface";
 import { applyFilters } from "./applyFilters";
 
 interface createMaskProps {
@@ -44,6 +45,11 @@ interface createMaskProps {
   appIsReady: boolean;
 }
 
+// Két stamp közti távolság a kefe sugarához képest (0.25 = az átmérő 12.5%-a)
+const STAMP_SPACING = 0.25;
+// A drága stage render maximális gyakorisága rajzolás közben
+const PREVIEW_INTERVAL_MS = 120;
+
 export const useMask = (props: createMaskProps) => {
   const appRef = props.appRef;
   const temporarySpriteRef = props.temporarySpriteRef;
@@ -61,10 +67,16 @@ export const useMask = (props: createMaskProps) => {
   const renderTextures = image?.renderTextures;
   const layer = renderTextures?.find((rt) => rt.id === selectedLayer);
 
-  const pending: { x: number; y: number }[] = [];
+  // Minden ref stabil a renderek között, így nem vesznek el a sorban álló pontok
+  const pendingRef = useRef<Points[]>([]);
   const reqAnimFramId = useRef<null | number>(null);
-  const frameSkip = useRef(0);
-  const emptyContainerRef = useRef(new Container());
+  const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastPreview = useRef(0);
+  // setIsDrawing aszinkron, ezért a pointer eseményekhez szinkron jelző kell
+  const drawingRef = useRef(false);
+  const batchContainerRef = useRef<Container | null>(null);
+  const spritePoolRef = useRef<Sprite[]>([]);
+  const emptyContainerRef = useRef<Container | null>(null);
 
   const gradient = useMemo(
     () =>
@@ -96,8 +108,6 @@ export const useMask = (props: createMaskProps) => {
     return texture;
   }, [gradient, appIsReady]);
 
-  const brushSpriteRef = useRef(new Sprite(brushTexture));
-
   const latestRef = useRef({
     selectedLayer,
     brushSize,
@@ -112,7 +122,6 @@ export const useMask = (props: createMaskProps) => {
     isDrawing: props.isDrawing,
     temporarySpriteRef,
     brushTexture,
-    pending,
   });
 
   latestRef.current = {
@@ -129,88 +138,153 @@ export const useMask = (props: createMaskProps) => {
     isDrawing: props.isDrawing,
     temporarySpriteRef,
     brushTexture,
-    pending,
   };
 
   //TODO: Még annyit lehetne hogy a kép ne teljese res-be legyen és a performance egész jó lehet
 
-  function pushPoint() {
+  // A drága stage render legfeljebb PREVIEW_INTERVAL_MS-onként fut, a végén mindig lefut még egyszer
+  function schedulePreview() {
+    if (previewTimer.current !== null) return;
+
+    const wait = Math.max(
+      0,
+      PREVIEW_INTERVAL_MS - (performance.now() - lastPreview.current),
+    );
+
+    previewTimer.current = setTimeout(() => {
+      previewTimer.current = null;
+      lastPreview.current = performance.now();
+
+      if (appRef.current) appRef.current.renderer.render(appRef.current.stage);
+    }, wait);
+  }
+
+  function cancelScheduled() {
+    if (reqAnimFramId.current !== null) {
+      cancelAnimationFrame(reqAnimFramId.current);
+      reqAnimFramId.current = null;
+    }
+
+    if (previewTimer.current !== null) {
+      clearTimeout(previewTimer.current);
+      previewTimer.current = null;
+    }
+  }
+
+  // A sorban álló pontokat egyetlen render hívással rajzolja a temporary textúrára
+  function flushPending() {
     reqAnimFramId.current = null;
 
     const current = latestRef.current;
+    const queue = pendingRef.current;
 
-    const queue = current.pending.splice(0, current.pending.length);
-    if (queue.length === 0 || !current.brushTexture) return;
+    if (queue.length === 0) return;
 
-    const batchContainer = new Container();
-    const brushScale = current.brushSize / current.scale / 100;
-
-    for (const point of queue) {
-      const pointSprite = new Sprite(current.brushTexture);
-      pointSprite.position.set(
-        point.x / current.scale,
-        point.y / current.scale,
-      );
-      pointSprite.scale.set(brushScale);
-      pointSprite.blendMode = current.maskErase ? "erase" : "normal";
-      batchContainer.addChild(pointSprite);
+    if (!current.brushTexture || !appRef.current) {
+      queue.length = 0;
+      return;
     }
 
-    appRef.current?.renderer.render({
-      container: batchContainer,
+    if (!batchContainerRef.current) batchContainerRef.current = new Container();
+
+    const container = batchContainerRef.current;
+    const pool = spritePoolRef.current;
+    const brushScale = current.brushSize / current.scale / 100;
+    const blendMode = current.maskErase ? "erase" : "normal";
+
+    for (let i = 0; i < queue.length; i++) {
+      let sprite = pool[i];
+
+      if (!sprite) {
+        sprite = new Sprite();
+        pool[i] = sprite;
+      }
+
+      sprite.texture = current.brushTexture;
+      sprite.position.set(queue[i].x / current.scale, queue[i].y / current.scale);
+      sprite.scale.set(brushScale);
+      sprite.blendMode = blendMode;
+
+      if (sprite.parent !== container) container.addChild(sprite);
+    }
+
+    container.removeChildren(queue.length);
+    queue.length = 0;
+
+    appRef.current.renderer.render({
+      container,
       target: current.temporarySpriteRef.current.texture,
       clear: false,
     });
 
-    batchContainer.destroy({ children: true, texture: false });
-
-    frameSkip.current++;
-
-    if (frameSkip.current % 9 === 0)
-      appRef.current?.renderer.render(appRef.current.stage);
-
-    if (current.pending.length > 0 && reqAnimFramId.current === null)
-      reqAnimFramId.current = requestAnimationFrame(pushPoint);
+    schedulePreview();
   }
 
-  function commitPoint(x: number, y: number) {
-    const current = latestRef.current;
-
-    if (current.selectedLayer === null) return;
-
-    current.pending.push({ x, y });
-
-    if (current.layer?.filter)
-      current.layer.filter.resources.layer_mask =
-        props.maskTextureRef.current?.source;
-
+  function requestFlush() {
     if (reqAnimFramId.current === null)
-      reqAnimFramId.current = requestAnimationFrame(pushPoint);
+      reqAnimFramId.current = requestAnimationFrame(flushPending);
+  }
+
+  // A pontokat a kefe méretéhez igazított távolságonként rakja le, a köztes szakaszt interpolálja,
+  // így a sűrű egér események nem generálnak felesleges stamp-eket, a gyors húzás pedig nem lyukas
+  function addStroke(x: number, y: number) {
+    const current = latestRef.current;
+    const queue = pendingRef.current;
+    const spacing = Math.max(1, current.brushSize * STAMP_SPACING);
+
+    const lastX = props.lastX.current;
+    const lastY = props.lastY.current;
+
+    if (lastX === null || lastY === null) {
+      queue.push({ x, y });
+      props.lastX.current = x;
+      props.lastY.current = y;
+      return;
+    }
+
+    const dx = x - lastX;
+    const dy = y - lastY;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist < spacing) return;
+
+    const steps = Math.floor(dist / spacing);
+    const stepX = (dx / dist) * spacing;
+    const stepY = (dy / dist) * spacing;
+
+    for (let i = 1; i <= steps; i++)
+      queue.push({ x: lastX + stepX * i, y: lastY + stepY * i });
+
+    props.lastX.current = lastX + stepX * steps;
+    props.lastY.current = lastY + stepY * steps;
   }
 
   const onPointerMove = (e: any) => {
     const localPos = e.global;
 
-    if (!localPos) return;
+    if (!localPos || !drawingRef.current) return;
+    if (latestRef.current.selectedLayer === null) return;
 
-    const x = localPos.x;
-    const y = localPos.y;
+    addStroke(localPos.x, localPos.y);
 
-    const current = latestRef.current;
-
-    if (current.isDrawing === false || current.selectedLayer === null) return;
-    if (props.lastX.current && props.lastY.current) commitPoint(x, y);
-
-    props.lastX.current = x;
-    props.lastY.current = y;
+    if (pendingRef.current.length > 0) requestFlush();
   };
 
   const onPointerUp = () => {
     const current = latestRef.current;
+
+    if (!drawingRef.current) return;
+
+    drawingRef.current = false;
     props.setIsDrawing(false);
+    props.lastX.current = null;
+    props.lastY.current = null;
+
+    cancelScheduled();
+    flushPending();
+    cancelScheduled();
 
     if (
-      !brushSpriteRef.current ||
       current.selectedLayer === null ||
       !current.renderTextures ||
       current.renderTextures.length <= 0 ||
@@ -227,6 +301,8 @@ export const useMask = (props: createMaskProps) => {
       target: maskTex,
       clear: false,
     });
+
+    if (!emptyContainerRef.current) emptyContainerRef.current = new Container();
 
     appRef.current.renderer.render({
       container: emptyContainerRef.current,
@@ -247,21 +323,26 @@ export const useMask = (props: createMaskProps) => {
   };
 
   const onPointerDown = (e: any) => {
-    props.setIsDrawing(true);
-
     const localPos = e.global;
 
     if (!localPos) return;
 
-    const x = localPos.x;
-    const y = localPos.y;
-
-    props.lastX.current = x;
-    props.lastY.current = y;
-
     const current = latestRef.current;
 
-    if (current.selectedLayer !== null) commitPoint(x, y);
+    if (current.selectedLayer === null) return;
+
+    drawingRef.current = true;
+    props.setIsDrawing(true);
+
+    props.lastX.current = null;
+    props.lastY.current = null;
+
+    if (current.layer?.filter)
+      current.layer.filter.resources.layer_mask =
+        props.maskTextureRef.current?.source;
+
+    addStroke(localPos.x, localPos.y);
+    requestFlush();
   };
 
   useEffect(() => {
@@ -270,12 +351,17 @@ export const useMask = (props: createMaskProps) => {
 
     stage.on("pointermove", onPointerMove);
     stage.on("pointerup", onPointerUp);
+    stage.on("pointerupoutside", onPointerUp);
     stage.on("pointerdown", onPointerDown);
 
     return () => {
       stage.off("pointermove", onPointerMove);
       stage.off("pointerup", onPointerUp);
+      stage.off("pointerupoutside", onPointerUp);
       stage.off("pointerdown", onPointerDown);
+
+      cancelScheduled();
+      pendingRef.current.length = 0;
     };
   }, [appIsReady]);
 };

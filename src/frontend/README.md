@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WizPX – Frontend
 
-## Getting Started
+Next.js (App Router) + Chakra UI + Pixi.js alapú szerkesztőfelület. A szerkesztés előnézete teljes egészében a böngészőben, WebGL-en fut, a backend csak az exportnál dolgozik.
 
-First, run the development server:
+## Indítás
+
+A teljes stack indításához (frontend + backend + nginx) lásd: [`docs/START_DEV.md`](../../docs/START_DEV.md).
+
+Csak a frontend, Docker nélkül:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd src/frontend
+npm install
+npm run dev   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Típusellenőrzés: `npx tsc --noEmit`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Felépítés
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Mappa | Tartalom |
+|---|---|
+| `app/` | Next.js oldalak (feltöltés, galéria, szerkesztő) |
+| `components/webGlComponent.tsx` | Pixi `Application` létrehozása, kép betöltése, layout, szűrők és az első maszk réteg |
+| `components/editing/` | Szerkesztő UI: oldalsáv, caption, channel mixer, LUT, maszk, resize, szöveg, vízjel |
+| `handlers/filters/` | GLSL fragment shaderek (exposure, brightness, contrast, temperature, hue, levels, channel mixer, vibrance, maszkolt változat) |
+| `helper/mask/` | Maszkrajzolás (`useMask.ts`) és a rétegek összefűzése (`applyFilters.ts`) |
+| `helper/export/` | Exportáláskor a backendnek küldött adatok összeállítása |
+| `providers/sessionprovider.tsx` | Pixi ref-ek és a szerkesztő munkamenet állapota |
+| `stores/` | Zustand store-ok (képek, szűrők, rétegek) |
 
-## Learn More
+## Maszkolás
 
-To learn more about Next.js, take a look at the following resources:
+Minden réteghez tartozik egy maszk textúra (`RenderTexture`, a kép felbontásán), egy eredmény textúra és egy szűrő. A rétegek egymás után futnak: az előző réteg eredménye a következő bemenete, a maszk pedig megmondja, hol érvényesül a réteg szűrője.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Rajzolás közben (`helper/mask/useMask.ts`):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Az egér mozgásából a kefe méretéhez igazított távolságonként (a sugár negyede) kerül stamp a sorba, a köztes szakaszok interpolálva, így gyors húzásnál sincs lyuk, sűrű egér eseményeknél pedig nincs felesleges munka.
+2. A sorban álló stamp-ek `requestAnimationFrame`-enként **egyetlen** render hívással kerülnek a *temporary* textúrára (a sprite-ok újrahasznosítva, nincs frame-enkénti allokáció).
+3. A stage előnézete legfeljebb ~120 ms-onként renderelődik (`PREVIEW_INTERVAL_MS`), a stroke végén garantáltan még egyszer.
+4. Az egér felengedésekor (`pointerup` / `pointerupoutside`) a temporary textúra beleíródik a réteg maszkjába, és csak ekkor fut le a drága rétegkomponálás (`applyFilters`).
 
-## Deploy on Vercel
+A Pixi ticker szándékosan le van állítva (`app.ticker.stop()`), minden renderelést a kód explicit hív.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Ismert TODO-k
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- A maszk textúrák teljes képfelbontásúak; kisebb felbontású előnézeti maszkkal tovább csökkenthető a GPU/CPU terhelés.
+- Croppolás nagyobb felbontásnál elcsúszhat (`webGlComponent.tsx`).
