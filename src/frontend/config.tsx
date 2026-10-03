@@ -28,7 +28,7 @@ export interface LinkType {
 
 export const links: LinkType[] = [
   {
-    name: "Főőodal",
+    name: "Főoldal",
     link: "/",
     icon: <LuHouse size={22} />,
   },
