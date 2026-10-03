@@ -12,6 +12,7 @@
 
 # env
 **/.env*
+!**/.env.example
 
 # mac
 **/.DS_Store

@@ -36,11 +36,15 @@ cd WizPX/src
 
 ### 1. `.env` fájlok létrehozása
 
-A `compose.yml` mindkét szolgáltatásnál `env_file`-t vár, ezért a fájloknak léteznie kell. Jelenleg a kód nem olvas környezeti változókat, így üres fájl is elég:
+A `compose.yml` mindkét szolgáltatásnál `env_file`-t vár, ezért a fájloknak léteznie kell. Másold le a mintákat:
 
 ```bash
-touch ./frontend/.env ./backend/.env
+cp ./frontend/.env.example ./frontend/.env
+cp ./backend/.env.example ./backend/.env
 ```
+
+> [!NOTE]
+> Jelenleg a kód nem olvas környezeti változókat, ezért a minták tartalma nem kötelező, de a fájloknak léteznie kell.
 
 ---
 
