@@ -208,7 +208,9 @@ export const useMask = (props: createMaskProps) => {
       if (sprite.parent !== container) container.addChild(sprite);
     }
 
-    container.removeChildren(queue.length);
+    // a removeChildren hibát dob, ha a tartomány üres
+    if (container.children.length > queue.length)
+      container.removeChildren(queue.length);
     queue.length = 0;
 
     appRef.current.renderer.render({
@@ -337,9 +339,9 @@ export const useMask = (props: createMaskProps) => {
     props.lastX.current = null;
     props.lastY.current = null;
 
-    if (current.layer?.filter)
+    if (current.layer?.filter && current.layer.maskTexture)
       current.layer.filter.resources.layer_mask =
-        props.maskTextureRef.current?.source;
+        current.layer.maskTexture.source;
 
     addStroke(localPos.x, localPos.y);
     requestFlush();
