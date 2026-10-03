@@ -44,7 +44,9 @@ cp ./backend/.env.example ./backend/.env
 ```
 
 > [!NOTE]
-> Jelenleg a kód nem olvas környezeti változókat, ezért a minták tartalma nem kötelező, de a fájloknak léteznie kell.
+> - `frontend/.env`: a mintában `NEXT_PUBLIC_API_URL=/api` szerepel. Jelenleg a frontend kód nem olvassa, az API hívások fix `/api/...` útvonalra mennek, amit az nginx a backendre irányít.
+> - `backend/.env`: a minta üres, a backend jelenleg nem használ környezeti változót.
+> - A fájlok akkor is kellenek, ha üresek, mert a `compose.yml` `env_file`-ként hivatkozik rájuk.
 
 ---
 

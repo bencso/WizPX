@@ -27,23 +27,65 @@ Az **WizPX** segítségével a fotósok *percek alatt* közösségi médiára k�
 ### Főbb funkciók:
 
 #### Feldolgozás
-- `JPG`, `PNG`, `HEIC` támogatás
-- EXIF adatokból caption-ök generálása *(késöbb a szövegnél is elérhető lesz)*
+- Drag & drop feltöltés, egyszerre legfeljebb 5 kép (`AVIF`, `JPG`, `PNG`, `TIFF`, `WebP`)
+- EXIF adatok kinyerése, ezekből caption-ök generálása (a szövegnél is elérhető)
 
 #### Szerkesztés
-- Expozíció / fényerő / kontraszt / színhőmérséklet / tint / telítettség / vibrance (bőrtónus védelemmel) / hue / levels / gamma
-- Channel mixer
-- LUT
-- **Maszkolás:** rétegenként egérrel rajzolt (puha szélű) maszk, a szűrők csak a maszkolt területre hatnak
-- Átméretezés, szöveg, vízjel
+- **Színkorrekció:** expozíció, fényerő, kontraszt, színhőmérséklet, tint, telítettség, vibrance (bőrtónus védelemmel), hue, value, levels, gamma
+- **Channel mixer**
+- **LUT** használata
+- **Maszkolás:** rétegenként egérrel rajzolt, puha szélű maszk (rajzolás / törlés mód, állítható kefeméret és élesség), a szűrők csak a maszkolt területre hatnak
+- A szerkesztés előnézete valós időben, a böngészőben (WebGL) fut
+
+#### Kompozíció
+- Közösségi média méretek (Instagram, Facebook, X) – expand / crop
+- Képkeret
+- Szöveg a fotóra, vízjel / saját copyright kép
 
 #### Export
-- Vízjel
-- Szöveg a fotóra
-- Képkeret
-- Közösségi médiára optimalizálás (expand / crop)
+- `JPG`, `PNG`, `BMP`, `WebP`, `GIF`, `TIFF`
+- Több kép exportálása egyszerre
 
-#### LUT készítése (tervezet)
+#### Tervezett
+- `HEIC` támogatás
+- LUT készítése a webes felületen
+
+<p align="right"><a href="#top">Vissza a tetejére</a></p>
+
+---
+
+## Gyors indítás
+
+```bash
+git clone https://github.com/bencso/WizPX.git
+cd WizPX/src
+cp ./frontend/.env.example ./frontend/.env
+cp ./backend/.env.example ./backend/.env
+docker compose up --build
+```
+
+Ezután a frontend a [http://localhost](http://localhost) címen érhető el. A részletes leírás: [`docs/START_DEV.md`](docs/START_DEV.md).
+
+---
+
+## Dokumentáció
+
+| Dokumentum | Tartalom |
+|---|---|
+| [`docs/START_DEV.md`](docs/START_DEV.md) | Fejlesztői környezet indítása (Docker és Docker nélkül) |
+| [`src/frontend/README.md`](src/frontend/README.md) | Frontend felépítés, a maszkrajzolás működése |
+| [`docs/kepszerkeszt-megertesehez.md`](docs/kepszerkeszt-megertesehez.md) | A szűrők mögötti matematika és GLSL implementációk (LUT, HSV, levels, channel mixer, white balance, vibrance) |
+
+## Projektszerkezet
+
+```text
+src/
+├── frontend/   Next.js + Chakra UI + Pixi.js (szerkesztőfelület)
+├── backend/    FastAPI + pyvips / Pillow (export, LUT, maszk, vízjel, keret)
+├── nginx/      reverse proxy (/ → frontend, /api → backend)
+└── compose.yml
+docs/           fejlesztői dokumentáció
+```
 
 <p align="right"><a href="#top">Vissza a tetejére</a></p>
 
