@@ -1,3 +1,4 @@
+import { apiUrl } from "@/helper/api";
 import { UseFileUploadReturn } from "@chakra-ui/react";
 import { Dispatch, SetStateAction } from "react";
 
@@ -28,7 +29,7 @@ export const uploadFile = async ({
         const formData = new FormData();
         formData.append("file", file);
 
-        const res = await fetch("/api/images/upload", {
+        const res = await fetch(apiUrl("/images/upload"), {
           method: "POST",
           body: formData,
         }).catch(() => null);

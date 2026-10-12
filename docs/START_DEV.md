@@ -44,7 +44,7 @@ cp ./backend/.env.example ./backend/.env
 ```
 
 > [!NOTE]
-> - `frontend/.env`: a mintában `NEXT_PUBLIC_API_URL=/api` szerepel. Jelenleg a frontend kód nem olvassa, az API hívások fix `/api/...` útvonalra mennek, amit az nginx a backendre irányít.
+> - `frontend/.env`: a `NEXT_PUBLIC_API_URL` a backend elérésének előtagja, a frontend `NEXT_PUBLIC_API_URL + /api/...` címekre hív (pl. `http://localhost` -> `http://localhost/api/images/upload`). Ha üres vagy hiányzik, relatív `/api/...` útvonalat használ. A böngésző hívja, ezért olyan címnek kell lennie, ami a böngészőből elérhető (a Docker-belső `http://backend:3001` nem az), és érdemes az nginx címét megadni, mert a `/api` előtagot az nginx veszi le.
 > - `backend/.env`: a minta üres, a backend jelenleg nem használ környezeti változót.
 > - A fájlok akkor is kellenek, ha üresek, mert a `compose.yml` `env_file`-ként hivatkozik rájuk.
 

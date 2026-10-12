@@ -1,3 +1,4 @@
+import { apiUrl } from "@/helper/api";
 import {
   CustomImage,
   DraggableImageEventPosition,
@@ -109,7 +110,7 @@ export async function exportSelectedImage(
     copyrightImage,
   );
 
-  await fetch("/api/images/export", {
+  await fetch(apiUrl("/images/export"), {
     method: "POST",
     body: formBody,
   })
