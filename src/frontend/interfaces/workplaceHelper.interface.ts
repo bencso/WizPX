@@ -10,6 +10,7 @@ import { Application, Container, ContainerChild, Renderer } from "pixi.js";
 export const previewScale = 0.35;
 
 export interface CreateCPImageProps {
+  appRef?: RefObject<Application | null>;
   copyrightImage: CopyrightImage | undefined;
   canvasRef: RefObject<HTMLCanvasElement | null>;
   borderSize:

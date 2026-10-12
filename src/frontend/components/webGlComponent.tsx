@@ -252,15 +252,10 @@ export default function WebGlComponent() {
       const renderSprite = new Sprite(texture);
       renderSprite.anchor.set(0.5);
 
-      const prevStage = appRef.current.stage.children.filter(
-        (fs) => fs !== renderSprite,
-      )[0];
-
-      if (prevStage) appRef.current.stage.removeChild(prevStage);
+      // Minden betöltésnél tiszta stage, különben a korábbi betöltésekből megmaradó
+      // (régi) overlay a képek alatt marad, az overlayRef pedig egy a stage-en nem lévő példányra mutat
+      appRef.current.stage.removeChildren();
       appRef.current.stage.addChild(renderSprite);
-
-      if (!appRef.current.stage.getChildByLabel("overlayContainer"))
-        appRef.current.stage.addChild(overlay);
 
       image = useSessionStore
         .getState()
@@ -271,6 +266,8 @@ export default function WebGlComponent() {
       maskTextureRef.current = image.renderTexture;
 
       appRef.current.stage.addChild(temporaryTextureSprite);
+      // az overlay (szövegek, overlay kép) legyen legfelül
+      appRef.current.stage.addChild(overlay);
 
       const brush = new Graphics();
 

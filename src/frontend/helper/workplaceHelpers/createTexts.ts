@@ -3,6 +3,7 @@ import { CreateTextsProps } from "@/interfaces/workplaceHelper.interface";
 import { isXPositions, isYPositions } from "../positions/checkXYPositions";
 import { calculatePosition } from "../positions/calculationPosition";
 import { BitmapText } from "pixi.js";
+import { requestRender } from "../render/requestRender";
 
 export function createTexts(props: CreateTextsProps) {
   const texts = props.texts ?? [];
@@ -75,6 +76,7 @@ export function createTexts(props: CreateTextsProps) {
       if (draggableText === text.id) {
         const newPosition = event.global;
         textElement.position.set(newPosition.x, newPosition.y);
+        requestRender(appRef.current);
       }
     });
 
@@ -97,4 +99,6 @@ export function createTexts(props: CreateTextsProps) {
 
     overlayRef.current?.addChild(textElement);
   });
+
+  requestRender(appRef.current);
 }

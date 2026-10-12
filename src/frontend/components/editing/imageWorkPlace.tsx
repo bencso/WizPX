@@ -67,7 +67,10 @@ export default function ImageWorkPlace() {
     appRef.current.stage.interactiveChildren = true;
   }
 
+  // A szövegek és az overlay kép újrarajzolása, ha bármelyikük (vagy a méretezés) változik
   useEffect(() => {
+    overlayRef.current?.removeChildren();
+
     createTexts({
       texts,
       scale,
@@ -84,13 +87,22 @@ export default function ImageWorkPlace() {
     });
 
     createCPImage({
+      appRef,
       overlayRef,
       copyrightImage,
       canvasRef,
       scale,
       borderSize,
     });
-  }, [selectedImg]);
+  }, [
+    selectedImg,
+    image?.texts,
+    texts.length,
+    copyrightImage,
+    scale,
+    borderSize,
+    draggableText,
+  ]);
 
   useMask({
     appRef,
