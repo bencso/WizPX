@@ -1,3 +1,4 @@
+import { toaster } from "@/components/ui/toaster";
 import { apiUrl } from "@/helper/api";
 import {
   CustomImage,
@@ -33,13 +34,15 @@ export async function exportSelectedImage(
   let selectedImage = images.find((i) => i.id === id);
   if (!selectedImage) return;
 
-  let haldImage = exportData.hald ?? "";
+  // A hald (LUT) kép: a kiválasztott képnél frissen kirenderelve, a többinél a mentett érték
+  let haldImage: string | undefined = exportData.hald;
   let maskImages = await exportMasks(selectedImage, appRef);
   let masksImageHalds = await exportMaskHalds(selectedImage, appRef);
 
   if (exportData.hald === undefined && appRef.current) setSelectedImg(id);
 
-  haldImage = exportHald(id, selectedImg, selectedImage, appRef);
+  const currentHald = await exportHald(id, selectedImg, selectedImage, appRef);
+  if (currentHald) haldImage = currentHald;
 
   const scale = calcScale({
     workPlaceRef,
@@ -76,10 +79,15 @@ export async function exportSelectedImage(
   );
 
   const blob = await fetch(selectedImage.blob).then((res) => res.blob());
-  const haldBlob = await fetch(haldImage).then((res) => res.blob());
 
   const imageBlobFile = new File([blob], `image_${selectedImage.id}`);
-  const haldFile = new File([haldBlob], `hald_${selectedImage.id}`);
+  // Hald kép nélkül nem küldünk LUT-ot (a backend LUT nélkül is exportál)
+  const haldFile = haldImage
+    ? new File(
+        [await fetch(haldImage).then((res) => res.blob())],
+        `hald_${selectedImage.id}`,
+      )
+    : null;
 
   let texts: (ExportText | undefined)[] = [];
 
@@ -105,25 +113,42 @@ export async function exportSelectedImage(
     copyrightImage,
   );
 
-  await fetch(apiUrl("/images/export"), {
+  const res = await fetch(apiUrl("/images/export"), {
     method: "POST",
     body: formBody,
-  })
-    .catch(() => null)
-    .then(async (res) => {
-      if (res) {
-        const blob = await res?.blob();
-        const imageUrl = URL.createObjectURL(blob);
+  }).catch(() => null);
 
-        setSuccessfulyImages((prev) => [
-          ...prev,
-          {
-            title: String(selectedImage.id),
-            data: imageUrl,
-            extension: selectedImage.exportSettings?.fileExtension ?? "jpg",
-          } as SuccessfullyImagesProps,
-        ]);
-        setSuccessfullyImageShow(true);
-      }
+  if (!res) {
+    toaster.create({
+      title: "Az exportálás sikertelen",
+      description: "A szerver nem érhető el.",
+      type: "error",
     });
+    return;
+  }
+
+  // Hiba esetén a backend JSON-t ad vissza, azt nem szabad képként megjeleníteni
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+
+    toaster.create({
+      title: "Az exportálás sikertelen",
+      description: error?.message ?? `Hiba (${res.status})`,
+      type: "error",
+    });
+    return;
+  }
+
+  const resultBlob = await res.blob();
+  const imageUrl = URL.createObjectURL(resultBlob);
+
+  setSuccessfulyImages((prev) => [
+    ...prev,
+    {
+      title: String(selectedImage.id),
+      data: imageUrl,
+      extension: selectedImage.exportSettings?.fileExtension ?? "jpg",
+    } as SuccessfullyImagesProps,
+  ]);
+  setSuccessfullyImageShow(true);
 }

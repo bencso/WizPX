@@ -12,7 +12,7 @@ export function createFormBody(
   >,
   texts: (ExportText | undefined)[],
   imageBlobFile: File,
-  haldFile: File,
+  haldFile: File | null,
   masksImages: string[],
   masksImageHalds: string[],
   copyrightImage: File | null,
@@ -57,7 +57,7 @@ export function createFormBody(
   const formData = new FormData();
 
   formData.append("file", imageBlobFile);
-  formData.append("lut", haldFile, "hald.png");
+  if (haldFile) formData.append("lut", haldFile, "hald.png");
 
   if (copyrightImage)
     formData.append("copyright_image", copyrightImage, "copyright.png");
