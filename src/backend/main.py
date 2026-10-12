@@ -25,7 +25,6 @@ app.add_middleware(
 
 
 app.include_router(image.router)
-app.include_router(image.router, prefix="/api", include_in_schema=False)
 
 @app.get("/status")
 def status():

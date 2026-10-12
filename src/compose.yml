@@ -12,7 +12,7 @@ services:
     environment:
       WATCHPACK_POLLING: "true"
     env_file:
-      - ./frontend/.env
+      - ./frontend/.env.local
     restart: unless-stopped
     networks:
       - wizpx_app
