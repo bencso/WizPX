@@ -7,8 +7,7 @@ from routers import image
 
 app = FastAPI()
 
-# A frontend a böngészőből közvetlenül is hívhatja a backendet (NEXT_PUBLIC_API_URL),
-# ehhez CORS kell. Az engedélyezett origin-ek vesszővel elválasztva: CORS_ORIGINS
+
 cors_origins = [
     origin.strip()
     for origin in os.environ.get(
@@ -24,11 +23,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Az nginx az /api előtagot leveszi, ezért a router előtag nélkül is elérhető marad,
-# közvetlen hívásnál (pl. http://localhost:3001/api/images/upload) pedig az /api alatt
+
 app.include_router(image.router)
 app.include_router(image.router, prefix="/api", include_in_schema=False)
-
 
 @app.get("/status")
 def status():
