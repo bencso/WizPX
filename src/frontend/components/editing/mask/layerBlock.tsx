@@ -270,7 +270,7 @@ const LayersAccordion = () => {
                         }}
                       >
                         {selectedLayer !== null && selectedLayer === layer.id
-                          ? "Kiválasztva"
+                          ? "Kiválasztva " + layer.id
                           : "Kiválasztás"}
                       </Button>
                     </GridItem>

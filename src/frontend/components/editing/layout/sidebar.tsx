@@ -81,7 +81,7 @@ const sidebarElements = (
   return [
     {
       function: "Kép szöveg",
-      hide: image.captionSamples.length <= 0 || selectedLayer !== null,
+      hide: image.captionSamples.length <= 0 || selectedLayer !== 0,
       icon: <LuTag />,
       inputs: [
         {
@@ -94,7 +94,7 @@ const sidebarElements = (
     {
       function: "Maszkolás",
       icon: <LuVenetianMask />,
-      hide: selectedLayer === null,
+      hide: selectedLayer === 0,
       inputs: [
         {
           name: "",
@@ -106,7 +106,7 @@ const sidebarElements = (
     {
       function: "LUT",
       icon: <TbColorSwatch />,
-      hide: selectedLayer !== null,
+      hide: selectedLayer !== 0,
       inputs: [
         {
           name: "",
@@ -681,7 +681,7 @@ const sidebarElements = (
     {
       function: "Szövegek",
       icon: <LuType />,
-      hide: selectedLayer !== null,
+      hide: selectedLayer !== 0,
       inputs: [
         {
           name: "",
@@ -693,7 +693,7 @@ const sidebarElements = (
     {
       function: "Overlay kép",
       icon: <LuImages />,
-      hide: selectedLayer !== null,
+      hide: selectedLayer !== 0,
       inputs: [
         {
           name: "",
@@ -705,7 +705,7 @@ const sidebarElements = (
     {
       function: "Képkeret",
       icon: <LuFrame />,
-      hide: selectedLayer !== null,
+      hide: selectedLayer !== 0,
       inputs: [
         {
           name: "Képkeret méret",
@@ -792,7 +792,7 @@ const sidebarElements = (
     {
       function: "Méretezés",
       icon: <LuImageUpscale />,
-      hide: selectedLayer !== null,
+      hide: selectedLayer !== 0,
       inputs: [
         {
           name: "",
@@ -833,7 +833,7 @@ export default function SideBar() {
     .sessionData.find((si) => si.id === selectedImg);
 
   const filters =
-    selectedLayer !== null
+    selectedLayer !== null && selectedLayer !== 0
       ? useSessionStore.getState().getFilters(selectedImg, selectedLayer)
       : useSessionStore.getState().getFilters(selectedImg);
 
