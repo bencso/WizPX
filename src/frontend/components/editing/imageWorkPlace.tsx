@@ -67,7 +67,6 @@ export default function ImageWorkPlace() {
     appRef.current.stage.interactiveChildren = true;
   }
 
-  // A szövegek és az overlay kép újrarajzolása, ha bármelyikük (vagy a méretezés) változik
   useEffect(() => {
     overlayRef.current?.removeChildren();
 
@@ -143,9 +142,10 @@ export default function ImageWorkPlace() {
         h={"full"}
         w={"full"}
         boxSizing={"border-box"}
-         display={"flex"}   justifyContent={"center"}
-          alignItems={"center"}
-          alignContent={"center"}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+        alignContent={"center"}
         flexDir={!isMd ? "column" : "row"}
         gap={12}
         mx={"auto"}

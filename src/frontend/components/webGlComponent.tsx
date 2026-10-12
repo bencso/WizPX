@@ -252,8 +252,6 @@ export default function WebGlComponent() {
       const renderSprite = new Sprite(texture);
       renderSprite.anchor.set(0.5);
 
-      // Minden betöltésnél tiszta stage, különben a korábbi betöltésekből megmaradó
-      // (régi) overlay a képek alatt marad, az overlayRef pedig egy a stage-en nem lévő példányra mutat
       appRef.current.stage.removeChildren();
       appRef.current.stage.addChild(renderSprite);
 
@@ -266,7 +264,6 @@ export default function WebGlComponent() {
       maskTextureRef.current = image.renderTexture;
 
       appRef.current.stage.addChild(temporaryTextureSprite);
-      // az overlay (szövegek, overlay kép) legyen legfelül
       appRef.current.stage.addChild(overlay);
 
       const brush = new Graphics();

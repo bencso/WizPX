@@ -4,8 +4,6 @@ import { calculatePosition } from "../positions/calculationPosition";
 import { CreateCPImageProps } from "@/interfaces/workplaceHelper.interface";
 import { requestRender } from "../render/requestRender";
 
-// A kép aszinkron töltődik be: ha közben újabb hívás érkezik (pl. gyors egymásutáni
-// módosítás), a régi betöltés eredményét el kell dobni, különben duplikálódik az overlay kép
 const latestCall = new WeakMap<Container, number>();
 
 export function createCPImage(props: CreateCPImageProps) {
@@ -25,7 +23,6 @@ export function createCPImage(props: CreateCPImageProps) {
 
   const imageElement = new Image();
 
-  // A sprite-ot csak a kép betöltése után szabad létrehozni, különben a textúra üresen töltődik fel
   imageElement.onload = () => {
     if (latestCall.get(overlay) !== callId || overlay.destroyed) return;
 
@@ -40,7 +37,6 @@ export function createCPImage(props: CreateCPImageProps) {
 
     let position = copyrightImage.position;
 
-    // Feltöltés után a pozíció szöveges érték (pl. left / top), ilyenkor ez a relatív pozíció
     const relativePosition =
       copyrightImage.relativePosition ??
       (isXPositions(position?.x) && isYPositions(position?.y)
