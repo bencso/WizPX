@@ -3,13 +3,12 @@ import { CustomImage } from "@/interfaces/interface";
 
 export function createFormBody(
   selectedImage: CustomImage,
-  cpImagePostion: Promise<
+  cpImagePostion:
     | {
         x: any;
         y: any;
       }
-    | undefined
-  >,
+    | undefined,
   texts: (ExportText | undefined)[],
   imageBlobFile: File,
   haldFile: File | null,

@@ -71,7 +71,7 @@ export async function exportSelectedImage(
 
   // A copyright képnek a helyezetének lekérése
   const cpRelativePosition = selectedImage.copyrightImage?.relativePosition;
-  let cpImagePostion = getCopyrightImagePosition(
+  let cpImagePostion = await getCopyrightImagePosition(
     selectedImage,
     cpRelativePosition,
     scale,

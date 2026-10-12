@@ -1,6 +1,6 @@
 import base64
 import json
-from typing import Annotated, Text
+from typing import Annotated
 from fastapi import UploadFile, APIRouter, Form, File
 from fastapi.responses import JSONResponse, Response
 import piexif
@@ -9,6 +9,7 @@ from functions.caption_generator import CaptionGenerator
 from dependencies import IMAGE_EXTENSIONS
 from pyvips import Image
 from functions.convert_img_file import Export
+from functions.customtext import Text
 from functions.lut import Lut
 from functions.mask import Mask
 from functions.resize_img import ResizeImg
@@ -102,7 +103,8 @@ async def exportImage(
         exif_bytes = None
         hald = None
 
-        exif_bytes = image.get("exif-data")
+        # Ha a képben nincs EXIF (pl. képernyőmentés), a get() kivételt dobna
+        exif_bytes = image.get("exif-data") if image.get_typeof("exif-data") != 0 else None
         exif_data = []
 
         image = PIL.Image.fromarray(image.numpy())
@@ -137,15 +139,18 @@ async def exportImage(
 
         if copyright_image is not None:
             cp_image = await copyright_image.read()
-            cp = base64.b64encode(cp_image).decode("utf-8")
-            cp = cp.get_img()
+            cp = PIL.Image.open(io.BytesIO(cp_image))
 
             copyright_image_size = int(data.get("copyright_image_size")) or 0
             copyright_image_position = data.get("copyright_image_position")
             copyright_image_opacity = float(
                 data.get("copyright_image_opacity")) or 100
-            copyright_image_position = (
-                round(copyright_image_position["x"]), round(copyright_image_position["y"]))
+            if not copyright_image_position:
+                # nincs megadott pozíció: bal felső sarok (a WaterMarking kezeli a szöveges értékeket)
+                copyright_image_position = ("LEFT", "TOP")
+            else:
+                copyright_image_position = (
+                    round(copyright_image_position["x"]), round(copyright_image_position["y"]))
             copyright_image_opacity = int(
                 (copyright_image_opacity / 100.0) * 255)
 
