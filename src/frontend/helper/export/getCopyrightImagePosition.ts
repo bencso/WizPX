@@ -16,7 +16,6 @@ export async function getCopyrightImagePosition(
 ) {
   const savedPosition = selectedImage.copyrightImage?.position;
 
-  // Feltöltés után a pozíció szöveges érték (pl. left / top), ilyenkor ez a relatív pozíció
   const relativePosition =
     cpRelativePosition ??
     (isXPositions(savedPosition?.x) && isYPositions(savedPosition?.y)

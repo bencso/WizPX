@@ -103,7 +103,6 @@ async def exportImage(
         exif_bytes = None
         hald = None
 
-        # Ha a képben nincs EXIF (pl. képernyőmentés), a get() kivételt dobna
         exif_bytes = image.get("exif-data") if image.get_typeof("exif-data") != 0 else None
         exif_data = []
 
