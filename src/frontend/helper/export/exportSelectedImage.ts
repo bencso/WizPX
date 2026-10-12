@@ -1,17 +1,12 @@
 import { apiUrl } from "@/helper/api";
 import {
   CustomImage,
-  DraggableImageEventPosition,
-  XPositions,
-  YPositions,
 } from "@/interfaces/interface";
 import { Application, Renderer, Sprite, Texture, TextureSource } from "pixi.js";
 import { Dispatch, RefObject, SetStateAction } from "react";
 import { exportMasks } from "./exportMasks";
 import { exportMaskHalds } from "./exportMaskHalds";
 import { calcScale } from "../sizes/calcScale";
-import { isXPositions, isYPositions } from "../positions/checkXYPositions";
-import { calculatePosition } from "../positions/calculationPosition";
 import { exportHald } from "./exportHalds";
 import { getCopyrightImagePosition } from "./getCopyrightImagePosition";
 import { ExportText } from "@/interfaces/exportTexts.interface";
