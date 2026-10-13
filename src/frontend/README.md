@@ -43,6 +43,12 @@ A Pixi `Application` ticker-e szándékosan le van állítva (`app.ticker.stop()
 
 Az overlay tartalmát (szövegek, overlay kép) az `imageWorkPlace.tsx` rajzolja újra, amikor változik a szöveg, az overlay kép, a skála vagy a keret. A módosítások után a `requestRender` kér egy stage renderelést, a rajzolás és a húzás közben is.
 
+## Erőforrások életciklusa
+
+- **Réteg törlése:** a lista módosítása után a rétegek láncát újra kell számolni (`applyFilters`), hogy a megjelenített sprite ne a törölt réteg textúrájára mutasson, és csak utána szabadulnak fel a réteg GPU-erőforrásai (`helper/mask/destroyLayer.ts`). A maszk és az eredmény textúra teljes képfelbontású, ezért `destroy` nélkül foglalt maradna a GPU-memória. A rétegazonosító nem a lista hossza, hanem a legnagyobb meglévő azonosító + 1, így törlés után sem ütközik.
+- **Újrakezdés:** a `clearSessionData` minden kép minden rétegét felszabadítja.
+- **Szövegek stage-figyelői:** a `createTexts` egyetlen `pointermove` / `pointerup` párt köt a stage-re, és cleanup függvényt ad vissza, amit az `imageWorkPlace.tsx` `useEffect`-je a következő újrarajzolás előtt meghív.
+
 ## Maszkolás
 
 Minden réteghez tartozik egy maszk textúra (`RenderTexture`, a kép felbontásán), egy eredmény textúra és egy szűrő. A rétegek egymás után futnak: az előző réteg eredménye a következő bemenete, a maszk pedig megmondja, hol érvényesül a réteg szűrője.

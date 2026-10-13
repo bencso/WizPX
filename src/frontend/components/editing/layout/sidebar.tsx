@@ -26,6 +26,7 @@ import {
 } from "@chakra-ui/react";
 import { Filter, Sprite } from "pixi.js";
 import { RefObject, useEffect, useMemo, useState } from "react";
+import { shallow } from "zustand/shallow";
 import {
   LuFrame,
   LuImages,
@@ -817,25 +818,28 @@ export default function SideBar() {
     selectedLayer,
   } = useWorkSession();
 
-  const {
-    editFilters,
-    getFilterValue,
-    setExpandMode,
-    setBorderSize,
-    setExpandBackground,
-  } = useSessionStore();
+  // Szelektoros feliratkozás: a műveletek stabil referenciák, így a menü nem renderel újra
+  // minden store-írásra, csak akkor, ha a kiválasztott kép vagy a szűrői változnak
+  const editFilters = useSessionStore((s) => s.editFilters);
+  const getFilterValue = useSessionStore((s) => s.getFilterValue);
+  const setExpandMode = useSessionStore((s) => s.setExpandMode);
+  const setBorderSize = useSessionStore((s) => s.setBorderSize);
+  const setExpandBackground = useSessionStore((s) => s.setExpandBackground);
 
   //#endregion
 
   //#region sidebar funkciók
-  const image = useSessionStore
-    .getState()
-    .sessionData.find((si) => si.id === selectedImg);
+  const image = useSessionStore((s) =>
+    s.sessionData.find((si) => si.id === selectedImg),
+  );
 
-  const filters =
-    selectedLayer !== null && selectedLayer !== 0
-      ? useSessionStore.getState().getFilters(selectedImg, selectedLayer)
-      : useSessionStore.getState().getFilters(selectedImg);
+  const filters = useSessionStore(
+    (s) =>
+      selectedLayer !== null && selectedLayer !== 0
+        ? s.getFilters(selectedImg, selectedLayer)
+        : s.getFilters(selectedImg),
+    shallow,
+  );
 
   //#region breakPoint beállíátoks (isMd)
   const isMd = useBreakpointValue(
@@ -844,21 +848,41 @@ export default function SideBar() {
   );
   //#endregion
 
-  const sidebar = sidebarElements(
-    selectedImg,
-    editFilters,
-    getFilterValue,
-    spriteRef,
-    setExpandMode,
-    setBorderSize,
-    selectedScale,
-    setExpandBackground,
-    filters,
-    selectedChannel,
-    webglFilterRef,
-    imageScale,
-    image,
-    selectedLayer,
+  // A több száz soros menü-konfiguráció (JSX-szel) csak akkor épül újra, ha valamelyik bemenete változik
+  const sidebar = useMemo(
+    () =>
+      sidebarElements(
+        selectedImg,
+        editFilters,
+        getFilterValue,
+        spriteRef,
+        setExpandMode,
+        setBorderSize,
+        selectedScale,
+        setExpandBackground,
+        filters,
+        selectedChannel,
+        webglFilterRef,
+        imageScale,
+        image,
+        selectedLayer,
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      selectedImg,
+      editFilters,
+      getFilterValue,
+      setExpandMode,
+      setBorderSize,
+      setExpandBackground,
+      selectedScale,
+      filters,
+      selectedChannel,
+      webglFilterRef.current,
+      imageScale,
+      image,
+      selectedLayer,
+    ],
   );
 
   //#endregion

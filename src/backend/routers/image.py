@@ -13,6 +13,7 @@ from functions.customtext import Text
 from functions.lut import Lut
 from functions.mask import Mask
 from functions.resize_img import ResizeImg
+from functions.upload_limits import UploadLimitError, check_pixels, read_limited
 from functions.valid_colors import validColors
 import PIL
 from functions.watermark import WaterMarking
@@ -29,8 +30,9 @@ async def uploadImage(file: UploadFile):
             raise Exception(
                 f"Hibás fájlformátum, az alábbi fájlokat fogadjuk el: {str.join(', ', IMAGE_EXTENSIONS)}"
             )
-        img_file_buffer = await file.read()
+        img_file_buffer = await read_limited(file)
         img = Image.new_from_buffer(img_file_buffer, "")
+        check_pixels(img.width, img.height)
 
         caption_helper = CaptionGenerator(img=img)
         caption_sample = caption_helper.getSampleForPhoto() or []
@@ -53,6 +55,13 @@ async def uploadImage(file: UploadFile):
             content={
                 "message": "Sikeres feltöltés",
                 "data": data,
+            },
+        )
+    except UploadLimitError as ex:
+        return JSONResponse(
+            status_code=413,
+            content={
+                "message": f"{ex}",
             },
         )
     except Exception as ex:
@@ -89,14 +98,15 @@ async def exportImage(
         masks_number = data.get("masks_number") or 0
 
         if masks_files is not None and len(masks_files) > 0:
-            masks_files_buffers = [await mask_file.read() for mask_file in masks_files]
+            masks_files_buffers = [await read_limited(mask_file) for mask_file in masks_files]
 
         if masks_hald_files is not None and len(masks_hald_files) > 0:
-            masks_hald_files_buffers = [await mask_hald_file.read() for mask_hald_file in masks_hald_files]
+            masks_hald_files_buffers = [await read_limited(mask_hald_file) for mask_hald_file in masks_hald_files]
 
-        img_buffer = await file.read()
+        img_buffer = await read_limited(file)
 
         image = Image.new_from_buffer(img_buffer, "")
+        check_pixels(image.width, image.height)
         image = image.autorot()
         image = image.icc_transform("sRGB")
 
@@ -109,7 +119,7 @@ async def exportImage(
         image = PIL.Image.fromarray(image.numpy())
 
         if lut:
-            lut_file_bytes = await lut.read()
+            lut_file_bytes = await read_limited(lut)
             hald = PIL.Image.open(io.BytesIO(lut_file_bytes)).convert("RGB")
             lut_helper = Lut(hald, image)
             image = lut_helper.apply_hald()
@@ -137,7 +147,7 @@ async def exportImage(
             image = border_helper.apply()
 
         if copyright_image is not None:
-            cp_image = await copyright_image.read()
+            cp_image = await read_limited(copyright_image)
             cp = PIL.Image.open(io.BytesIO(cp_image))
 
             copyright_image_size = int(data.get("copyright_image_size")) or 0
@@ -171,6 +181,13 @@ async def exportImage(
         return Response(
             content=exporter,
             media_type="image/png"
+        )
+    except UploadLimitError as ex:
+        return JSONResponse(
+            status_code=413,
+            content={
+                "message": f"{ex}",
+            },
         )
     except Exception as ex:
         return JSONResponse(

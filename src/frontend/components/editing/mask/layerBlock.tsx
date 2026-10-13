@@ -23,6 +23,9 @@ import { allFiltersFragment } from "@/handlers/filters/allFiltersFragment";
 import { getChannelOffsets } from "@/helper/lut/getChannelOffset";
 import { filters } from "@/interfaces/filters.interface";
 import { maskFiltersFragment } from "@/handlers/filters/maskFiltersFragment";
+import { applyFilters } from "@/helper/mask/applyFilters";
+import { destroyLayerResources } from "@/helper/mask/destroyLayer";
+import { requestRender } from "@/helper/render/requestRender";
 
 //#region SIDEBAR ITEM
 export const MaskLayerBlock = () => {
@@ -100,6 +103,8 @@ const LayersAccordion = () => {
     textureRef,
     webglFilterRef,
     temporarySpriteRef,
+    spriteRef,
+    renderSpriteRef,
   } = useWorkSession();
 
   const image = sessionData.find((i) => i.id == selectedImg);
@@ -108,7 +113,8 @@ const LayersAccordion = () => {
   function createNew() {
     if (!textureRef.current) return;
 
-    let index = renderTextures?.length ?? 0;
+    // az azonosító nem a lista hossza: törlés után az ütközne egy meglévő réteggel
+    let index = Math.max(-1, ...(renderTextures ?? []).map((r) => r.id)) + 1;
     const channelOffset = getChannelOffsets(filters);
 
     const layer = new Container();
@@ -180,14 +186,13 @@ const LayersAccordion = () => {
       },
     });
 
+    // Az ideiglenes (előnézeti) sprite a loadImage-ben már a stage-en van. Csak akkor kerül fel,
+    // ha hiányzik: az újbóli addChild a stage tetejére tenné, az overlay (szövegek) fölé.
     if (appRef.current) {
-      const hover = appRef.current.stage.getChildByLabel(
-        temporarySpriteRef.current.label,
-      );
+      const temporarySprite = temporarySpriteRef.current;
 
-      if (hover) {
-        appRef.current.stage.addChild(temporarySpriteRef.current);
-      }
+      if (temporarySprite.parent !== appRef.current.stage)
+        appRef.current.stage.addChild(temporarySprite);
     }
 
     webglFilterRef.current = filter;
@@ -283,23 +288,32 @@ const LayersAccordion = () => {
                           onClick={() => {
                             if (index <= 0) return;
 
-                            const layerId = layer.id;
-                            deleteLayer(selectedImg, layerId);
+                            setSelectLayer(0);
 
-                            const selectedLayer = renderTextures.find(
-                              (ri) => ri.id === layer.id,
+                            // 1) a lista módosítása
+                            const removedLayer = deleteLayer(
+                              selectedImg,
+                              layer.id,
                             );
 
-                            setSelectLayer(0);
+                            // 2) a rétegek láncának újraszámolása, hogy a megjelenített sprite már ne a
+                            // törölt réteg textúrájára mutasson
+                            const updatedImage = useSessionStore
+                              .getState()
+                              .sessionData.find((si) => si.id === selectedImg);
 
-                            if (!appRef.current) return;
-                            {
-                              appRef.current.stage.removeChild(
-                                selectedLayer?.resultTexture,
-                              );
-                            }
+                            applyFilters({
+                              image: updatedImage,
+                              spriteRef,
+                              appRef,
+                              textureRef,
+                              renderSpriteRef,
+                            });
 
-                            setSelectLayer(0);
+                            // 3) a törölt réteg GPU-erőforrásainak felszabadítása
+                            destroyLayerResources(removedLayer);
+
+                            requestRender(appRef.current);
                           }}
                         >
                           <LuTrash /> Törlés

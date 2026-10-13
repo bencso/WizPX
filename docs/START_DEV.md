@@ -45,7 +45,7 @@ cp ./backend/.env.example ./backend/.env
 
 > [!NOTE]
 > - `frontend/.env`: a `NEXT_PUBLIC_API_URL` a backend **teljes elérési alapja**, a frontend ehhez fűzi hozzá az útvonalat (`NEXT_PUBLIC_API_URL + /images/upload`, `/images/export`). Nginx mögött (Docker Compose, `http://localhost`) értéke `/api`, mert az nginx a `/api` előtagot leveszi és továbbítja a backendnek. A backendet közvetlenül is hívhatod (`NEXT_PUBLIC_API_URL=http://localhost:3001`), ilyenkor a böngészőből elérhető címet kell megadni (a Docker-belső `http://backend:3001` nem az), és CORS kell (lásd lent). A változó kötelező, nélküle a hívások a frontend saját útvonalára mennének.
-> - `backend/.env`: `CORS_ORIGINS` (vesszővel elválasztva) azok az origin-ek, amelyekről a böngésző közvetlenül hívhatja a backendet. Alapértelmezés: `http://localhost,http://localhost:3000`. Az nginx-en keresztüli hívásnál (`/api`) nincs szükség CORS-ra, mert egy origin-ről jön a frontend és az API is. A backend maga nem ismeri az `/api` előtagot.
+> - `backend/.env`: `CORS_ORIGINS` (vesszővel elválasztva) azok az origin-ek, amelyekről a böngésző közvetlenül hívhatja a backendet. Alapértelmezés: `http://localhost,http://localhost:3000`. Az nginx-en keresztüli hívásnál (`/api`) nincs szükség CORS-ra, mert egy origin-ről jön a frontend és az API is. A backend maga nem ismeri az `/api` előtagot. Ugyanitt állíthatók a feltöltési korlátok: `MAX_UPLOAD_MB` (fájlonként, alapértelmezés 100) és `MAX_IMAGE_MEGAPIXELS` (alapértelmezés 100). A korlát feletti feltöltésre a backend 413-as választ ad.
 > - A fájlok akkor is kellenek, ha üresek, mert a `compose.yml` `env_file`-ként hivatkozik rájuk.
 
 ---

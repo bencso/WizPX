@@ -227,7 +227,7 @@ export interface SessionStore {
   //#endregion
 
   //#region LAYER
-  deleteLayer: (id: number, layerId: number) => void;
+  deleteLayer: (id: number, layerId: number) => MasksLayers | undefined;
   //#endregion
 
   //#region MÉRETEK

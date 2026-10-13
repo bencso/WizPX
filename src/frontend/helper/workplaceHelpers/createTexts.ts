@@ -5,7 +5,9 @@ import { calculatePosition } from "../positions/calculationPosition";
 import { BitmapText } from "pixi.js";
 import { requestRender } from "../render/requestRender";
 
-export function createTexts(props: CreateTextsProps) {
+// Visszaad egy cleanup függvényt, ami leveszi a stage-ről a most felvett figyelőket.
+// Enélkül minden újrarajzolásnál újabb figyelők halmozódnának a stage-en.
+export function createTexts(props: CreateTextsProps): (() => void) | undefined {
   const texts = props.texts ?? [];
   const appRef = props.appRef;
   const scale = props.scale ?? 1;
@@ -18,6 +20,8 @@ export function createTexts(props: CreateTextsProps) {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
+
+  const textElements = new Map<string, BitmapText>();
 
   texts.forEach((text: DraggableImageEvent) => {
     let textPosition = text.position;
@@ -72,33 +76,51 @@ export function createTexts(props: CreateTextsProps) {
       textElement.anchor = 0.5;
     });
 
-    appRef.current?.stage.on("pointermove", (event) => {
-      if (draggableText === text.id) {
-        const newPosition = event.global;
-        textElement.position.set(newPosition.x, newPosition.y);
-        requestRender(appRef.current);
-      }
-    });
-
-    appRef.current?.stage.on("pointerup", () => {
-      props.setDraggable(null);
-      props.setTextPosition(
-        selectedImg,
-        text.id,
-        {
-          x: textElement.x,
-          y: textElement.y,
-        },
-        scale,
-      );
-      props.setTextRelativePosition(selectedImg, text.id, {
-        x: 0,
-        y: 0,
-      });
-    });
+    textElements.set(text.id, textElement);
 
     overlayRef.current?.addChild(textElement);
   });
 
+  const stage = appRef.current?.stage;
+
+  if (!stage) return;
+
+  // Egyetlen figyelőpár az összes szövegre, csak a húzott szöveggel foglalkozik
+  const onPointerMove = (event: { global: { x: number; y: number } }) => {
+    if (draggableText === null) return;
+
+    const dragged = textElements.get(draggableText);
+    if (!dragged) return;
+
+    dragged.position.set(event.global.x, event.global.y);
+    requestRender(appRef.current);
+  };
+
+  const onPointerUp = () => {
+    if (draggableText === null) return;
+
+    const dragged = textElements.get(draggableText);
+
+    props.setDraggable(null);
+
+    if (!dragged) return;
+
+    props.setTextPosition(
+      selectedImg,
+      draggableText,
+      { x: dragged.x, y: dragged.y },
+      scale,
+    );
+    props.setTextRelativePosition(selectedImg, draggableText, { x: 0, y: 0 });
+  };
+
+  stage.on("pointermove", onPointerMove);
+  stage.on("pointerup", onPointerUp);
+
   requestRender(appRef.current);
+
+  return () => {
+    stage.off("pointermove", onPointerMove);
+    stage.off("pointerup", onPointerUp);
+  };
 }

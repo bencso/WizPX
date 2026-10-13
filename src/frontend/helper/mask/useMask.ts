@@ -329,7 +329,11 @@ export const useMask = (props: createMaskProps) => {
     )
       return;
 
-    const maskTex = current.renderTextures[current.selectedLayer]?.maskTexture;
+    // a réteget azonosító szerint kell keresni: törlés után az azonosító nem egyezik a lista indexével
+    const layerIndex = current.renderTextures.findIndex(
+      (rt) => rt.id === current.selectedLayer,
+    );
+    const maskTex = current.renderTextures[layerIndex]?.maskTexture;
 
     if (!maskTex) return;
 
@@ -358,7 +362,7 @@ export const useMask = (props: createMaskProps) => {
     applyFilters({
       renderSpriteRef: current.renderSpriteRef,
       spriteRef: props.spriteRef,
-      startIndex: current.selectedLayer,
+      startIndex: layerIndex,
       image: current.image,
       appRef,
       textureRef: props.textureRef,

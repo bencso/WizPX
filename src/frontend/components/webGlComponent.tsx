@@ -189,14 +189,13 @@ export default function WebGlComponent() {
       },
     });
 
+    // Az ideiglenes (előnézeti) sprite a loadImage-ben már a stage-en van. Csak akkor kerül fel,
+    // ha hiányzik: az újbóli addChild a stage tetejére tenné, az overlay (szövegek) fölé.
     if (appRef.current) {
-      const hover = appRef.current.stage.getChildByLabel(
-        temporarySpriteRef.current.label,
-      );
+      const temporarySprite = temporarySpriteRef.current;
 
-      if (!hover) {
-        appRef.current.stage.addChild(temporarySpriteRef.current);
-      }
+      if (temporarySprite.parent !== appRef.current.stage)
+        appRef.current.stage.addChild(temporarySprite);
     }
 
     const fill = new Graphics();
@@ -239,6 +238,11 @@ export default function WebGlComponent() {
       const overlay = new Container();
 
       overlay.label = "overlayContainer";
+
+      // az előző ideiglenes (kép méretű) textúra felszabadítása, különben minden betöltés újat halmoz fel
+      const previousTemporary = temporarySpriteRef.current?.texture;
+      if (previousTemporary && previousTemporary !== Texture.EMPTY)
+        previousTemporary.destroy(true);
 
       const temporaryTexture = RenderTexture.create({
         width: img.width,

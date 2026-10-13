@@ -75,7 +75,7 @@ Ezután a frontend a [http://localhost](http://localhost) címen érhető el. A 
 | [`docs/START_DEV.md`](docs/START_DEV.md) | Fejlesztői környezet indítása (Docker és Docker nélkül) |
 | Beépített útmutató (`/docs`, a „Leírás” menüpont) | Felhasználói guide: felület, menüpontok, billentyűparancsok, maszkolás, exportálás |
 | [`src/frontend/README.md`](src/frontend/README.md) | Frontend felépítés, a maszkrajzolás működése |
-| [`docs/kepszerkeszt-megertesehez.md`](docs/kepszerkeszt-megertesehez.md) | A szűrők mögötti matematika és GLSL implementációk (LUT, HSV, levels, channel mixer, white balance, vibrance) |
+| [`docs/kepszerkeszt-megertesehez.md`](docs/kepszerkeszt-megertesehez.md) | A fejlesztő saját jegyzetei a tervezéshez: az alkalmazott technológiák és képszerkesztési alapok (LUT, színkorrekció, HSV, levels, channel mixer, white balance, vibrance, GLSL). Tervezés közben készült személyes jegyzet, nem hivatalos dokumentáció. |
 
 ## Projektszerkezet
 
@@ -219,6 +219,14 @@ flowchart LR
 *A szerkesztő: a Kép réteg bal felső sarkában szöveg, egy új rétegen pedig rajzolt maszk, ami csak a hegyvonulatra alkalmazza az expozíciót (2026.10.13.).*
 
 </br>
+<p align="right"><a href="#top">Vissza a tetejére</a></p>
+
+---
+
+## A kódról
+
+A projekt nagyrészt saját fejlesztés. A **teljesítmény-optimalizálásban Claude-ot** (az Anthropic AI asszisztensét) használtam, de azon kívül a kód nagy része a saját munkám, ezért **lehetnek benne optimalizálási hibák és hiányosságok**. Ha ilyet találsz, szívesen veszem a jelzést.
+
 <p align="right"><a href="#top">Vissza a tetejére</a></p>
 
 ---

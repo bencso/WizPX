@@ -70,7 +70,7 @@ export default function ImageWorkPlace() {
   useEffect(() => {
     overlayRef.current?.removeChildren();
 
-    createTexts({
+    const cleanupTexts = createTexts({
       texts,
       scale,
       appRef,
@@ -93,6 +93,9 @@ export default function ImageWorkPlace() {
       scale,
       borderSize,
     });
+
+    // a szövegek stage-figyelői ne halmozódjanak újrarajzolásonként
+    return () => cleanupTexts?.();
   }, [
     selectedImg,
     image?.texts,

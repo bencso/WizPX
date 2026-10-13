@@ -13,6 +13,7 @@ import {
 import { ColorMapFilter } from "pixi-filters";
 import { Filter, RenderTexture, Sprite, Texture } from "pixi.js";
 import { RefObject } from "react";
+import { destroyLayerResources } from "@/helper/mask/destroyLayer";
 import { v4 as uuidv4 } from "uuid";
 import { immer } from "zustand/middleware/immer";
 import { createWithEqualityFn } from "zustand/traditional";
@@ -29,6 +30,10 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
       }),
     clearSessionData: () =>
       set((state) => {
+        (state.sessionData as unknown as CustomImage[]).forEach((image) => {
+          image.renderTextures?.forEach(destroyLayerResources);
+        });
+
         state.sessionData = [];
       }),
     addImage: (blob: string, exifData?: string[], captionSamples?: string[]) =>
@@ -90,7 +95,7 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
 
           const prevTextures = image.renderTextures ?? [];
           const currentText = {
-            id: prevTextures.length,
+            id: Math.max(-1, ...prevTextures.map((layer) => layer.id)) + 1,
             maskTexture,
             resultTexture,
             haldSprite,
@@ -150,6 +155,8 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
 
     //#region Layer
     deleteLayer: (id: number, layerId: number) => {
+      let removedLayer: MasksLayers | undefined;
+
       set((state) => {
         const image = state.sessionData.find((si) => si.id === id);
 
@@ -160,11 +167,18 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
         );
         if (layerIndex === -1) return;
 
+        // másolat: a draft proxy az immer után már nem olvasható, a benne lévő Pixi objektumok viszont igen
+        removedLayer = { ...image.renderTextures[layerIndex] } as unknown as MasksLayers;
+
         image.renderTextures = [
           ...image.renderTextures.slice(0, layerIndex),
           ...image.renderTextures.slice(layerIndex + 1),
         ];
       });
+
+      // A hívó (layerBlock) előbb újraszámolja a rétegláncot, így a megjelenített sprite már nem
+      // hivatkozik a törölt réteg textúrájára, mire itt felszabadul
+      return removedLayer;
     },
     //#endregion
 
