@@ -84,7 +84,7 @@ class Text:
                 else int(FONT_WEIGHTS.get(t.weight, FONT_WEIGHTS.get("normal", 400)))
             )
             
-            font = ImageFont.truetype("fonts/Roboto.ttf", fontsize,layout_engine=ImageFont.Layout.BASIC)
+            font = ImageFont.truetype("fonts/Roboto-Regular.ttf", fontsize,layout_engine=ImageFont.Layout.BASIC)
             
             try:
                 font.set_variation_by_axes([fontweight])
