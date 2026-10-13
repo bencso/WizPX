@@ -10,8 +10,12 @@ import {
 import { HiAdjustments } from "react-icons/hi";
 import { TbColorFilter, TbColorSwatch, TbGradienter, TbShadow, TbTemperature } from "react-icons/tb";
 
+// Melyik rétegnél látszik a menüpont: "base" = Kép (0. réteg), "layer" = új (maszkolható) réteg
+export type MenuLayer = "base" | "layer";
+
 export interface MenuGuide {
   name: string;
+  layers: MenuLayer[];
   icon: ReactNode;
   summary: string;
   details: string[];
@@ -57,9 +61,9 @@ export const layoutParts = [
       "A szerkesztett kép előnézete. Itt rajzolhatsz maszkot, itt húzhatod a szövegeket és az overlay képet, itt állítod be a kivágást.",
   },
   {
-    name: "Rétegek (a vászon bal felső sarka)",
+    name: "Rétegek (a vászon felett)",
     description:
-      "A rétegek ikonra kattintva megnyílik a rétegek listája: Kép (0. réteg), új layer létrehozása, réteg kiválasztása vagy törlése.",
+      "A vászon felett lévő rétegek ikonra kattintva megnyílik a rétegek listája: Kép (0. réteg), új layer létrehozása, réteg kiválasztása vagy törlése. A jobb oldali menü tartalma attól függ, melyik réteg van kiválasztva.",
   },
   {
     name: "Szerkesztő menü (jobb oldal)",
@@ -71,6 +75,7 @@ export const layoutParts = [
 export const menuGuides: MenuGuide[] = [
   {
     name: "Kép szöveg",
+    layers: ["base"],
     icon: <LuTag />,
     summary: "Caption (képaláírás) szöveg az EXIF adatokból.",
     details: [
@@ -82,10 +87,11 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "Maszkolás",
+    layers: ["layer"],
     icon: <LuVenetianMask />,
     summary: "Rajzolt, puha szélű maszk: a szűrők csak a maszkolt területre hatnak.",
     details: [
-      "Rajzolni csak az újonnan létrehozott rétegeken lehet, a 0. rétegre (Kép) nem.",
+      "A menüpont csak új rétegnél látszik, a 0. rétegre (Kép) nem lehet rajzolni.",
       "Draw / Erase: rajzolás vagy törlés mód.",
       "Ecset mérete: az ecset sugara.",
       "Ecset átmente: mennyire puha az ecset széle (0 = éles, 10 = teljesen puha).",
@@ -94,6 +100,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "LUT",
+    layers: ["base"],
     icon: <TbColorSwatch />,
     summary: "Look Up Table (.cube) betöltése színvilág (grading) alkalmazásához.",
     details: [
@@ -104,6 +111,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "Szűrők",
+    layers: ["base", "layer"],
     icon: <HiAdjustments />,
     summary: "Alap tónusbeállítások.",
     details: [
@@ -115,6 +123,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "Levels",
+    layers: ["base", "layer"],
     icon: <TbShadow />,
     summary: "Fekete- és fehérpont, gamma, kimeneti tartomány.",
     details: [
@@ -126,6 +135,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "HSV",
+    layers: ["base", "layer"],
     icon: <TbGradienter />,
     summary: "Színárnyalat, telítettség és érték.",
     details: [
@@ -136,6 +146,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "Channel mixer",
+    layers: ["base", "layer"],
     icon: <TbColorFilter />,
     summary: "A kimeneti csatornák keverése a bemeneti csatornákból.",
     details: [
@@ -145,6 +156,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "Egyéb",
+    layers: ["base", "layer"],
     icon: <TbTemperature />,
     summary: "Fehéregyensúly és vibrance.",
     details: [
@@ -155,6 +167,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "Szövegek",
+    layers: ["base"],
     icon: <LuType />,
     summary: "Szöveg a fotóra.",
     details: [
@@ -166,6 +179,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "Overlay kép",
+    layers: ["base"],
     icon: <LuImages />,
     summary: "Saját kép (például vízjel vagy logó) a fotóra.",
     details: [
@@ -176,6 +190,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "Képkeret",
+    layers: ["base"],
     icon: <LuFrame />,
     summary: "Keret a kép köré.",
     details: [
@@ -185,6 +200,7 @@ export const menuGuides: MenuGuide[] = [
   },
   {
     name: "Méretezés",
+    layers: ["base"],
     icon: <LuImageUpscale />,
     summary: "A kép kivágása vagy átméretezése közösségi média formátumra.",
     details: [
@@ -239,7 +255,7 @@ export const maskSteps = [
   {
     title: "Új réteg",
     description:
-      "Nyisd meg a rétegek listáját (a vászon bal felső sarkában lévő ikon), és kattints az „Új layer” gombra. Az új réteg automatikusan kijelölődik.",
+      "Nyisd meg a rétegek listáját (a vászon felett lévő ikon), és kattints az „Új layer” gombra. Az új réteg automatikusan kijelölődik.",
   },
   {
     title: "Szűrők beállítása a rétegen",
@@ -263,6 +279,16 @@ export const faq: { question: string; answer: string }[] = [
     question: "Miért nem tudok rajzolni a 0. (Kép) rétegen?",
     answer:
       "A 0. réteg az alapréteg, ahol a teljes képre ható szűrők vannak. Maszkot csak új rétegen lehet rajzolni: hozz létre egy új layert, és jelöld ki.",
+  },
+  {
+    question: "Miért nem látom a jobb oldali menüben a Szövegek, LUT vagy Méretezés pontot?",
+    answer:
+      "A menü a kiválasztott rétegtől függ. A Kép (0. réteg) menüjében van minden, kivéve a Maszkolást. Új rétegnél csak a Maszkolás és a szűrők (Szűrők, Levels, HSV, Channel mixer, Egyéb) látszanak. A rétegek listájában válaszd ki újra a Kép réteget.",
+  },
+  {
+    question: "Beírtam egy szöveget, de nem látom a képen.",
+    answer:
+      "A szöveg alapértelmezett színe fehér, ezért világos vagy fehér háttéren (például átméretezés után a fehér vásznon) nem látszik. A szöveg beállításai között (Szín) válassz más színt.",
   },
   {
     question: "Miért lassú vagy akadozik a rajzolás nagy képen?",

@@ -158,7 +158,7 @@ flowchart LR
 | Cropolás / Expandolás | ✅ Kész |
 | Képkeret funkció | ✅ Kész |
 | Szerkesztés (szűrők, channel mixer) | ✅ Kész |
-| Maszkolás (rajzolt maszk rétegek) | 🟡 Folyamatban (teljesítmény optimalizálás) |
+| Maszkolás (rajzolt maszk rétegek) | 🟡 Folyamatban |
 | LUT használata / készítése | 🟡 Folyamatban |
 
 <p align="right"><a href="#top">Vissza a tetejére</a></p>
@@ -200,9 +200,11 @@ flowchart LR
 ## Screenshot
 
 > [!WARNING]
-> **BÉTA verzió (2026.05.21)** – hibák előfordulhatnak!
+> **BÉTA verzió** – hibák előfordulhatnak!
 
-<img width="1566" height="990" max-width="100%" alt="Képernyőfotó" src="https://github.com/user-attachments/assets/371d819d-5ec4-4a6e-919b-b9ebd607273c" />
+<img width="1600" height="1000" max-width="100%" alt="WizPX szerkesztő: szöveg a fotón és egy új rétegen rajzolt maszk, ami csak a hegyvonulatra alkalmazza a szűrőt" src="docs/images/screenshot.png" />
+
+*A szerkesztő: a Kép réteg bal felső sarkában szöveg, egy új rétegen pedig rajzolt maszk, ami csak a hegyvonulatra alkalmazza az expozíciót (2026.10.13.).*
 
 </br>
 <p align="right"><a href="#top">Vissza a tetejére</a></p>

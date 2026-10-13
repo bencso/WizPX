@@ -44,8 +44,8 @@ cp ./backend/.env.example ./backend/.env
 ```
 
 > [!NOTE]
-> - `frontend/.env`: a `NEXT_PUBLIC_API_URL` a backend elérésének előtagja, a frontend `NEXT_PUBLIC_API_URL + /api/...` címekre hív (pl. `http://localhost` -> `http://localhost/api/images/upload`). Ha üres vagy hiányzik, relatív `/api/...` útvonalat használ. A böngésző hívja, ezért olyan címnek kell lennie, ami a böngészőből elérhető (a Docker-belső `http://backend:3001` nem az), és érdemes az nginx címét megadni, mert a `/api` előtagot az nginx veszi le.
-> - `backend/.env`: `CORS_ORIGINS` (vesszővel elválasztva) azok az origin-ek, amelyekről a böngésző közvetlenül hívhatja a backendet. Alapértelmezés: `http://localhost,http://localhost:3000`. A backend az API-t `/api` előtaggal és anélkül is kiszolgálja, így `NEXT_PUBLIC_API_URL=http://localhost:3001` is működik (közvetlen hívás, CORS-szal), az nginx-es `http://localhost` pedig CORS nélkül.
+> - `frontend/.env`: a `NEXT_PUBLIC_API_URL` a backend **teljes elérési alapja**, a frontend ehhez fűzi hozzá az útvonalat (`NEXT_PUBLIC_API_URL + /images/upload`, `/images/export`). Nginx mögött (Docker Compose, `http://localhost`) értéke `/api`, mert az nginx a `/api` előtagot leveszi és továbbítja a backendnek. A backendet közvetlenül is hívhatod (`NEXT_PUBLIC_API_URL=http://localhost:3001`), ilyenkor a böngészőből elérhető címet kell megadni (a Docker-belső `http://backend:3001` nem az), és CORS kell (lásd lent). A változó kötelező, nélküle a hívások a frontend saját útvonalára mennének.
+> - `backend/.env`: `CORS_ORIGINS` (vesszővel elválasztva) azok az origin-ek, amelyekről a böngésző közvetlenül hívhatja a backendet. Alapértelmezés: `http://localhost,http://localhost:3000`. Az nginx-en keresztüli hívásnál (`/api`) nincs szükség CORS-ra, mert egy origin-ről jön a frontend és az API is. A backend maga nem ismeri az `/api` előtagot.
 > - A fájlok akkor is kellenek, ha üresek, mert a `compose.yml` `env_file`-ként hivatkozik rájuk.
 
 ---
@@ -118,4 +118,4 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 3001
 ```
 
-Ebben az esetben az nginx nincs a háttérben, ezért a frontendnek a `/api` útvonalat külön kell a backendre irányítani.
+Ebben az esetben az nginx nincs a háttérben, ezért a `frontend/.env`-ben `NEXT_PUBLIC_API_URL=http://localhost:3001` kell (és a backend `CORS_ORIGINS`-ében szerepelnie kell a frontend origin-jének, alapból a `http://localhost:3000` benne van).

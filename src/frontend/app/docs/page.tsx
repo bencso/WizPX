@@ -157,7 +157,7 @@ export default function DocsPage() {
             <Tabs.Content value="menu">
               <Section title="Menüpontok">
                 <Text color="fg.muted">
-                  A szerkesztő jobb oldali menüjének funkciói. Kattints egy sorra a részletekért.
+                  A szerkesztő jobb oldali menüjének funkciói. A címke mutatja, melyik rétegnél látszik a menüpont: a Kép (0. réteg) vagy egy új, maszkolható réteg. Kattints egy sorra a részletekért.
                 </Text>
                 <Accordion.Root collapsible multiple variant="enclosed">
                   {menuGuides.map((menu) => (
@@ -165,7 +165,19 @@ export default function DocsPage() {
                       <Accordion.ItemTrigger>
                         <Icon color="teal.fg">{menu.icon}</Icon>
                         <Box flex="1">
-                          <Text fontWeight="semibold">{menu.name}</Text>
+                          <HStack gap={2} wrap="wrap">
+                            <Text fontWeight="semibold">{menu.name}</Text>
+                            {menu.layers.includes("base") && (
+                              <Badge colorPalette="teal" variant="subtle">
+                                Kép réteg
+                              </Badge>
+                            )}
+                            {menu.layers.includes("layer") && (
+                              <Badge colorPalette="purple" variant="subtle">
+                                Új réteg
+                              </Badge>
+                            )}
+                          </HStack>
                           <Text color="fg.muted" fontSize="sm">
                             {menu.summary}
                           </Text>
