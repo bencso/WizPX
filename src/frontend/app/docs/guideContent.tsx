@@ -104,8 +104,9 @@ export const menuGuides: MenuGuide[] = [
     icon: <TbColorSwatch />,
     summary: "Look Up Table (.cube) betöltése színvilág (grading) alkalmazásához.",
     details: [
-      "Húzz egy .cube fájlt a mezőre, vagy kattints és válaszd ki.",
-      "A LUT az egész képre érvényes.",
+      "Kattints a „Fájl feltöltése (.cube)” mezőre, és válaszd ki a .cube fájlt. A betöltött LUT azonnal megjelenik a képen.",
+      "A mező melletti X gombbal eltávolíthatod a LUT-ot.",
+      "A LUT az egész képre érvényes, és exportáláskor is rákerül.",
       "A LUT működéséről a docs/kepszerkeszt-megertesehez.md ír részletesen.",
     ],
   },

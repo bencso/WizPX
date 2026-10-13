@@ -7,12 +7,12 @@
   <h2>Gyorsítsd fel a fotós workflow-d!</h2>
   <p><em>EXIF adatok kinyerése és manipulálása, képszerkesztés és közösségi médiára felkészítés egy helyen.</em></p>
 <p align="center">
-  <a href="#technológiák">Technológiák</a> |
+  <a href="#technologiak">Technológiák</a> |
   <a href="#roadmap">Roadmap</a> |
-  <a href="#architektúra">Architektúra</a> |
-  <a href="/docs/START_DEV.md">Első indítás (Fejlesztői)</a> |
+  <a href="#architektura">Architektúra</a> |
+  <a href="docs/START_DEV.md">Első indítás (Fejlesztői)</a> |
   <a href="#screenshot">Screenshot</a> |
-  <a href="#közreműködés">Közreműködés</a> |
+  <a href="#kozremukodes">Közreműködés</a> |
 </p>
 </div>
 
@@ -38,7 +38,7 @@ Az **WizPX** segítségével a fotósok *percek alatt* közösségi médiára k�
 - A szerkesztés előnézete valós időben, a böngészőben (WebGL) fut
 
 #### Kompozíció
-- Közösségi média méretek (Instagram, Facebook, X) – expand / crop
+- Közösségi média méretek (Instagram, Facebook, X, Pinterest) – expand / crop
 - Képkeret
 - Szöveg a fotóra, vízjel / saját copyright kép
 
@@ -92,6 +92,8 @@ docs/           fejlesztői dokumentáció
 
 ---
 
+<a id="technologiak"></a>
+
 ## Technológiák
 
 |     Terület     |                           Technológia                           |                     Miért?                     |
@@ -106,6 +108,8 @@ docs/           fejlesztői dokumentáció
 
 ---
 
+<a id="roadmap"></a>
+
 ## Roadmap
 
 ```mermaid
@@ -116,7 +120,7 @@ config:
 ---
 flowchart LR
  subgraph MVP["<br>"]
-        m1["Több fájl támogatás - JPG, PNG, HEIC"]
+        m1["Több fájl támogatás (max. 5)<br>AVIF, JPG, PNG, TIFF, WebP"]
         m2["EXIF + caption generálás"]
         m3["Kép méret optimalizálás"]
         m4["Testreszabható vízjel"]
@@ -129,13 +133,15 @@ flowchart LR
         w3["Vízjel pozíció/méret"]
         w4["Szöveg elhelyezés"]
         w5["Előnézet"]
-        w6["FastAPI API\nfolyamatban"]
+        w6["FastAPI API<br>(export, EXIF, caption)"]
+        w7["Rajzolt maszk rétegek"]
   end
  subgraph ADV["</br>"]
         a1["Saját galéria"]
         a2["Térkép képekhez"]
         a3["OAuth2 autentikáció"]
         a4["LUT generálás WEBes felületen keresztül (amit fel lehet használni majd a fotókhoz - mentheti a felhasználó ezeket)"]
+        a5["HEIC támogatás"]
   end
     Start["Projekt indulás"] --> MVP
     MVP --> WEB
@@ -144,7 +150,7 @@ flowchart LR
 
     Start@{ shape: terminal}
     style MVP fill:#C8E6C9,color:#00C853
-    style WEB fill:#FFE0B2
+    style WEB fill:#C8E6C9,color:#00C853
     style ADV fill:#FFCDD2
 ```
 
@@ -158,12 +164,16 @@ flowchart LR
 | Cropolás / Expandolás | ✅ Kész |
 | Képkeret funkció | ✅ Kész |
 | Szerkesztés (szűrők, channel mixer) | ✅ Kész |
-| Maszkolás (rajzolt maszk rétegek) | 🟡 Folyamatban |
-| LUT használata / készítése | 🟡 Folyamatban |
+| Maszkolás (rajzolt maszk rétegek) | ✅ Kész |
+| LUT használata (.cube) | ✅ Kész |
+| LUT készítése a webes felületen | 🔴 Tervezett |
+| HEIC támogatás | 🔴 Tervezett |
 
 <p align="right"><a href="#top">Vissza a tetejére</a></p>
 
 ---
+
+<a id="architektura"></a>
 
 ## Architektúra
 
@@ -197,6 +207,8 @@ flowchart LR
 
 ---
 
+<a id="screenshot"></a>
+
 ## Screenshot
 
 > [!WARNING]
@@ -210,6 +222,8 @@ flowchart LR
 <p align="right"><a href="#top">Vissza a tetejére</a></p>
 
 ---
+
+<a id="kozremukodes"></a>
 
 ## Közreműködés
 

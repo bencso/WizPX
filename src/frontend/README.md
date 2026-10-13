@@ -26,8 +26,22 @@ Típusellenőrzés: `npx tsc --noEmit`
 | `handlers/filters/` | GLSL fragment shaderek (exposure, brightness, contrast, temperature, hue, levels, channel mixer, vibrance, maszkolt változat) |
 | `helper/mask/` | Maszkrajzolás (`useMask.ts`) és a rétegek összefűzése (`applyFilters.ts`) |
 | `helper/export/` | Exportáláskor a backendnek küldött adatok összeállítása |
+| `helper/render/requestRender.ts` | Kért stage render, egy képkockán belül összevonva (a Pixi ticker le van állítva) |
+| `helper/api.ts` | A backend elérése: `apiUrl(path)` = `NEXT_PUBLIC_API_URL` + útvonal |
 | `providers/sessionprovider.tsx` | Pixi ref-ek és a szerkesztő munkamenet állapota |
 | `stores/` | Zustand store-ok (képek, szűrők, rétegek) |
+
+## Környezeti változók
+
+| Változó | Jelentés |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | A backend teljes elérési alapja, a hívások ehhez fűzik az útvonalat (`/images/upload`, `/images/export`). Nginx mögött `/api`, közvetlen backend-hívásnál `http://localhost:3001` (CORS szükséges). Lásd: [`docs/START_DEV.md`](../../docs/START_DEV.md). |
+
+## Stage és renderelés
+
+A Pixi `Application` ticker-e szándékosan le van állítva (`app.ticker.stop()`), ezért a stage-et csak explicit render frissíti. A stage felépítése (`webGlComponent.tsx`, `loadImage`): kép sprite, a maszkrajzolás ideiglenes (előnézeti) sprite-ja, legfelül az `overlayContainer` (szövegek, overlay kép). Minden betöltésnél tiszta stage-ből indul.
+
+Az overlay tartalmát (szövegek, overlay kép) az `imageWorkPlace.tsx` rajzolja újra, amikor változik a szöveg, az overlay kép, a skála vagy a keret. A módosítások után a `requestRender` kér egy stage renderelést, a rajzolás és a húzás közben is.
 
 ## Maszkolás
 

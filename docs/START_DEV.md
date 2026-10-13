@@ -7,12 +7,12 @@
   <h2>Gyorsítsd fel a fotós workflow-d!</h2>
   <p><em>EXIF adatok kinyerése és manipulálása, képszerkesztés és közösségi médiára felkészítés egy helyen.</em></p>
 <p align="center">
-  <a href="/README.md#technológiák">Technológiák</a> |
-  <a href="/README.md#roadmap">Roadmap</a> |
-  <a href="/README.md#architektúra">Architektúra</a> |
-  <a href="/docs/START_DEV.md"><strong>Első indítás (Fejlesztői)</strong></a> |
-  <a href="/README.md#screenshot">Screenshot</a> |
-  <a href="/README.md#közreműködés">Közreműködés</a> |
+  <a href="../README.md#technologiak">Technológiák</a> |
+  <a href="../README.md#roadmap">Roadmap</a> |
+  <a href="../README.md#architektura">Architektúra</a> |
+  <a href="START_DEV.md"><strong>Első indítás (Fejlesztői)</strong></a> |
+  <a href="../README.md#screenshot">Screenshot</a> |
+  <a href="../README.md#kozremukodes">Közreműködés</a> |
 </p>
 </div>
 
