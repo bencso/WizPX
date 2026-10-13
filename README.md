@@ -225,7 +225,7 @@ flowchart LR
 
 ## A kódról
 
-A projekt nagyrészt saját fejlesztés. A **teljesítmény-optimalizálásban Claude-ot** (az Anthropic AI asszisztensét) használtam, de azon kívül a kód nagy része a saját munkám, ezért **lehetnek benne optimalizálási hibák és hiányosságok**. Ha ilyet találsz, szívesen veszem a jelzést.
+A projekt nagyrészt saját fejlesztés. A **teljesítmény-optimalizáláshoz** (első alkalom, mikor GLSL-t és WEBGL-t használtam) **Claude-ot** használtam, de azon kívül a kód nagy része a saját munkám, ezért **lehetnek benne hibák és hiányosságok**. Ha ilyet találsz, szívesen veszem a jelzést.
 
 <p align="right"><a href="#top">Vissza a tetejére</a></p>
 
