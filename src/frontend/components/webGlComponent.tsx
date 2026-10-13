@@ -4,7 +4,6 @@ import { maskFiltersFragment } from "@/handlers/filters/maskFiltersFragment";
 import { getChannelOffsets } from "@/helper/lut/getChannelOffset";
 import { applyFilters } from "@/helper/mask/applyFilters";
 import { calcScale } from "@/helper/sizes/calcScale";
-import { previewScale } from "@/interfaces/workplaceHelper.interface";
 import { useWorkSession } from "@/providers/sessionprovider";
 import { useSessionStore } from "@/stores/sessionData";
 import { Box, parseColor } from "@chakra-ui/react";
@@ -22,7 +21,7 @@ import {
   Texture,
   UniformGroup,
 } from "pixi.js";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function WebGlComponent() {
   const {
@@ -189,8 +188,6 @@ export default function WebGlComponent() {
       },
     });
 
-    // Az ideiglenes (előnézeti) sprite a loadImage-ben már a stage-en van. Csak akkor kerül fel,
-    // ha hiányzik: az újbóli addChild a stage tetejére tenné, az overlay (szövegek) fölé.
     if (appRef.current) {
       const temporarySprite = temporarySpriteRef.current;
 

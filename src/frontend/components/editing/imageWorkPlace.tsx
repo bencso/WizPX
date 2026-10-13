@@ -94,7 +94,6 @@ export default function ImageWorkPlace() {
       borderSize,
     });
 
-    // a szövegek stage-figyelői ne halmozódjanak újrarajzolásonként
     return () => cleanupTexts?.();
   }, [
     selectedImg,

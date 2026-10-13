@@ -113,7 +113,6 @@ const LayersAccordion = () => {
   function createNew() {
     if (!textureRef.current) return;
 
-    // az azonosító nem a lista hossza: törlés után az ütközne egy meglévő réteggel
     let index = Math.max(-1, ...(renderTextures ?? []).map((r) => r.id)) + 1;
     const channelOffset = getChannelOffsets(filters);
 
@@ -186,8 +185,6 @@ const LayersAccordion = () => {
       },
     });
 
-    // Az ideiglenes (előnézeti) sprite a loadImage-ben már a stage-en van. Csak akkor kerül fel,
-    // ha hiányzik: az újbóli addChild a stage tetejére tenné, az overlay (szövegek) fölé.
     if (appRef.current) {
       const temporarySprite = temporarySpriteRef.current;
 
@@ -289,15 +286,11 @@ const LayersAccordion = () => {
                             if (index <= 0) return;
 
                             setSelectLayer(0);
-
-                            // 1) a lista módosítása
                             const removedLayer = deleteLayer(
                               selectedImg,
                               layer.id,
                             );
 
-                            // 2) a rétegek láncának újraszámolása, hogy a megjelenített sprite már ne a
-                            // törölt réteg textúrájára mutasson
                             const updatedImage = useSessionStore
                               .getState()
                               .sessionData.find((si) => si.id === selectedImg);
@@ -310,9 +303,7 @@ const LayersAccordion = () => {
                               renderSpriteRef,
                             });
 
-                            // 3) a törölt réteg GPU-erőforrásainak felszabadítása
                             destroyLayerResources(removedLayer);
-
                             requestRender(appRef.current);
                           }}
                         >

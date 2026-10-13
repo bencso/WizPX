@@ -155,7 +155,6 @@ async def exportImage(
             copyright_image_opacity = float(
                 data.get("copyright_image_opacity")) or 100
             if not copyright_image_position:
-                # nincs megadott pozíció: bal felső sarok (a WaterMarking kezeli a szöveges értékeket)
                 copyright_image_position = ("LEFT", "TOP")
             else:
                 copyright_image_position = (

@@ -45,9 +45,7 @@ interface createMaskProps {
   appIsReady: boolean;
 }
 
-// Két stamp közti távolság a kefe sugarához képest (0.25 = az átmérő 12.5%-a)
 const STAMP_SPACING = 0.25;
-// A drága stage render maximális gyakorisága rajzolás közben
 const PREVIEW_INTERVAL_MS = 120;
 
 export const useMask = (props: createMaskProps) => {
@@ -67,12 +65,10 @@ export const useMask = (props: createMaskProps) => {
   const renderTextures = image?.renderTextures;
   const layer = renderTextures?.find((rt) => rt.id === selectedLayer);
 
-  // Minden ref stabil a renderek között, így nem vesznek el a sorban álló pontok
   const pendingRef = useRef<Points[]>([]);
   const reqAnimFramId = useRef<null | number>(null);
   const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPreview = useRef(0);
-  // setIsDrawing aszinkron, ezért a pointer eseményekhez szinkron jelző kell
   const drawingRef = useRef(false);
   const batchContainerRef = useRef<Container | null>(null);
   const commitSpriteRef = useRef<Sprite | null>(null);
@@ -141,16 +137,11 @@ export const useMask = (props: createMaskProps) => {
     brushTexture,
   };
 
-  //TODO: Még annyit lehetne hogy a kép ne teljese res-be legyen és a performance egész jó lehet
-
-  // Az alapréteg (0) a globális szűrőké, arra nem lehet maszkot rajzolni
   function canDraw() {
     const layer = latestRef.current.selectedLayer;
     return layer !== null && layer !== 0;
   }
 
-  // Stage koordináta -> kép koordináta leképezés a megjelenített fő sprite alapján
-  // (skála + a sprite bal felső sarka a stage-en)
   function getMapping() {
     const sprite = props.spriteRef.current;
 
@@ -166,7 +157,6 @@ export const useMask = (props: createMaskProps) => {
     };
   }
 
-  // A drága stage render legfeljebb PREVIEW_INTERVAL_MS-onként fut, a végén mindig lefut még egyszer
   function schedulePreview() {
     if (previewTimer.current !== null) return;
 
@@ -195,7 +185,6 @@ export const useMask = (props: createMaskProps) => {
     }
   }
 
-  // A sorban álló pontokat egyetlen render hívással rajzolja a temporary textúrára
   function flushPending() {
     reqAnimFramId.current = null;
 
@@ -216,7 +205,6 @@ export const useMask = (props: createMaskProps) => {
     const { scale, offsetX, offsetY } = getMapping();
     const brushScale = current.brushSize / scale / 100;
 
-    // az előnézet sprite a kép méretű textúrát a megjelenített képre illeszti
     const preview = current.temporarySpriteRef.current;
     preview.scale.set(scale);
     preview.position.set(offsetX, offsetY);
@@ -243,7 +231,6 @@ export const useMask = (props: createMaskProps) => {
       if (sprite.parent !== container) container.addChild(sprite);
     }
 
-    // a removeChildren hibát dob, ha a tartomány üres
     if (container.children.length > queue.length)
       container.removeChildren(queue.length);
     queue.length = 0;
@@ -262,8 +249,7 @@ export const useMask = (props: createMaskProps) => {
       reqAnimFramId.current = requestAnimationFrame(flushPending);
   }
 
-  // A pontokat a kefe méretéhez igazított távolságonként rakja le, a köztes szakaszt interpolálja,
-  // így a sűrű egér események nem generálnak felesleges stamp-eket, a gyors húzás pedig nem lyukas
+
   function addStroke(x: number, y: number) {
     const current = latestRef.current;
     const queue = pendingRef.current;
@@ -329,17 +315,12 @@ export const useMask = (props: createMaskProps) => {
     )
       return;
 
-    // a réteget azonosító szerint kell keresni: törlés után az azonosító nem egyezik a lista indexével
     const layerIndex = current.renderTextures.findIndex(
       (rt) => rt.id === current.selectedLayer,
     );
     const maskTex = current.renderTextures[layerIndex]?.maskTexture;
 
     if (!maskTex) return;
-
-    // A temporary textúra kép méretű, a maszkba 1:1-ben kell beleírni. Az előnézet sprite a stage-en
-    // van (skálázva / eltolva, és a Pixi a stage-es világtranszformját használja), ezért a commit
-    // egy külön, a stage-en kívüli sprite-tal történik, aminek a transzformja mindig egységnyi
     if (!commitSpriteRef.current) commitSpriteRef.current = new Sprite();
 
     const commitSprite = commitSpriteRef.current;

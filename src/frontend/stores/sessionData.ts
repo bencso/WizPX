@@ -167,7 +167,6 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
         );
         if (layerIndex === -1) return;
 
-        // másolat: a draft proxy az immer után már nem olvasható, a benne lévő Pixi objektumok viszont igen
         removedLayer = { ...image.renderTextures[layerIndex] } as unknown as MasksLayers;
 
         image.renderTextures = [
@@ -176,8 +175,6 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
         ];
       });
 
-      // A hívó (layerBlock) előbb újraszámolja a rétegláncot, így a megjelenített sprite már nem
-      // hivatkozik a törölt réteg textúrájára, mire itt felszabadul
       return removedLayer;
     },
     //#endregion

@@ -5,8 +5,7 @@ import { calculatePosition } from "../positions/calculationPosition";
 import { BitmapText } from "pixi.js";
 import { requestRender } from "../render/requestRender";
 
-// Visszaad egy cleanup függvényt, ami leveszi a stage-ről a most felvett figyelőket.
-// Enélkül minden újrarajzolásnál újabb figyelők halmozódnának a stage-en.
+
 export function createTexts(props: CreateTextsProps): (() => void) | undefined {
   const texts = props.texts ?? [];
   const appRef = props.appRef;
@@ -85,7 +84,6 @@ export function createTexts(props: CreateTextsProps): (() => void) | undefined {
 
   if (!stage) return;
 
-  // Egyetlen figyelőpár az összes szövegre, csak a húzott szöveggel foglalkozik
   const onPointerMove = (event: { global: { x: number; y: number } }) => {
     if (draggableText === null) return;
 

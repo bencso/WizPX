@@ -25,7 +25,7 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { Filter, Sprite } from "pixi.js";
-import { RefObject, useEffect, useMemo, useState } from "react";
+import { RefObject, useMemo } from "react";
 import { shallow } from "zustand/shallow";
 import {
   LuFrame,
@@ -848,7 +848,6 @@ export default function SideBar() {
   );
   //#endregion
 
-  // A több száz soros menü-konfiguráció (JSX-szel) csak akkor épül újra, ha valamelyik bemenete változik
   const sidebar = useMemo(
     () =>
       sidebarElements(
