@@ -1,0 +1,110 @@
+"use client";
+
+import ColormodeSwitcher from "@/components/sidebar/colormodeswitch";
+import LanguageSwitcher from "@/components/sidebar/languageswitch";
+import { links, LinkType } from "@/config";
+import {
+  Avatar,
+  Box,
+  Flex,
+  IconButton,
+  useBreakpointValue,
+} from "@chakra-ui/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import InfoPopover from "./infopopover";
+import { LuArrowLeftToLine, LuArrowRightToLine } from "react-icons/lu";
+
+export const LeftSide = () => {
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true));
+  const isMd = useBreakpointValue(
+    { base: false, sm: false, md: false, lg: true, xl: true },
+    { fallback: "md" },
+  );
+
+  const [collapsed, setCollapsed] = useState(false);
+
+  return (
+    <Flex
+      p={0}
+      justifyContent={"space-between"}
+      flexDirection={"column"}
+      w={isMd ? (collapsed ? "20" : "50") : "full"}
+      h={isMd ? "full" : "fit"}
+      gap={4}
+      borderRightWidth={isMd ? "1px" : 0}
+      borderColor="border.disabled"
+    >
+      <Box>
+        {
+          //#endregion
+          //#region LINKEK implementálása
+        }
+        {links.map((link: LinkType, index: number) => {
+          return (
+            <Link href={link.link || "/"} key={index}>
+              <Box
+                p="4"
+                aria-current={
+                  mounted && pathname === link.link ? "page" : undefined
+                }
+                display={"flex"}
+                hidden={!isMd}
+                borderBottomWidth={"1px"}
+                borderColor="border.disabled"
+                textDecoration={"none"}
+                alignItems={"center"}
+                justifyContent={collapsed ? "center" : "left"}
+                gap={4}
+                borderLeftWidth="2px"
+                borderLeftColor={"border.disabled"}
+                borderRadius={0}
+                fontSize={12}
+                color="fg.muted"
+                _hover={{ bg: "bg.emphasized" }}
+                _currentPage={{
+                  borderLeftColor: "teal.fg",
+                  bg: "bg.muted",
+                  color: "teal.fg",
+                  "& svg": { color: "teal.fg" },
+                }}
+              >
+                {link.icon}
+                {!collapsed && link.name}
+              </Box>
+            </Link>
+          );
+        })}
+        {
+          //#endregion
+        }
+      </Box>
+      <Flex
+        p="4"
+        borderTopWidth="1px"
+        hidden={!isMd}
+        flexDir={collapsed ? "column-reverse" : "row"}
+        borderColor="border.disabled"
+        color="fg.disabled"
+        alignItems={"center"}
+        gap={4}
+      >
+        <IconButton
+          onClick={() => {
+            setCollapsed((prev) => !prev);
+          }}
+          variant="outline"
+          size="sm"
+        >
+          {!collapsed ? <LuArrowLeftToLine /> : <LuArrowRightToLine />}
+        </IconButton>
+        <InfoPopover />
+        <ColormodeSwitcher />
+        <LanguageSwitcher />
+      </Flex>
+    </Flex>
+  );
+};

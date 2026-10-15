@@ -1,0 +1,91 @@
+# ==========================================
+# Web Framework & Server (FastAPI, Uvicorn)
+# ==========================================
+fastapi
+fastapi-cli
+fastapi-cloud-cli
+starlette
+uvicorn
+uvloop
+websockets
+
+# ==========================================
+# Data Validation & Types (Pydantic)
+# ==========================================
+annotated-types
+email-validator
+pydantic
+pydantic-extra-types
+pydantic-settings
+pydantic_core
+typing-inspection
+typing_extensions
+matplotlib
+
+# ==========================================
+# HTTP Clients & Networking
+# ==========================================
+anyio
+certifi
+charset-normalizer
+dnspython
+h11
+httpcore
+httptools
+httpx
+idna
+requests
+urllib3
+
+# ==========================================
+# Math, Data Science & Geospatial
+# ==========================================
+geographiclib
+geopy
+numpy
+reverse_geocoder
+scipy
+
+# ==========================================
+# Image Processing
+# ==========================================
+piexif
+pillow
+pillow_heif
+pyparsing
+ImageIO
+pyvips
+
+# ==========================================
+# CLI Tools & Terminal Output
+# ==========================================
+click
+docopt
+Pygments
+rich
+rich-toolkit
+shellingham
+tqdm
+typer
+
+# ==========================================
+# Markdown & Templating
+# ==========================================
+annotated-doc
+Jinja2
+markdown-it-py
+MarkupSafe
+mdurl
+
+# ==========================================
+# Utilities, DevTools & Misc
+# ==========================================
+fastar
+pipreqs
+python-dotenv
+python-multipart
+PyYAML
+rignore
+sentry-sdk
+watchfiles
+yarg

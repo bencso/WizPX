@@ -1,0 +1,110 @@
+"use client";
+
+import { toaster } from "@/components/ui/toaster";
+import { FileUploadList } from "@/components/upload/fileuploadlist";
+import { uploadFile } from "@/handlers/imageUpload/fileUpload";
+import {
+  UPLOAD_ACCEPTED_FILES,
+  UPLOAD_MAX_FILES,
+} from "@/interfaces/upload.interface";
+import { useWorkSession } from "@/providers/sessionprovider";
+import { useSessionStore } from "@/stores/sessionData";
+import {
+  Box,
+  Button,
+  FileUpload,
+  Icon,
+  Stack,
+  useFileUpload,
+} from "@chakra-ui/react";
+import { LuUpload } from "react-icons/lu";
+import { BeatLoader } from "react-spinners";
+
+export default function UploadImageBlock() {
+  const { isLoading, setIsLoading, setStep, setSelectedImg } = useWorkSession();
+  const { addImage } = useSessionStore();
+
+  const fileUpload = useFileUpload({
+    maxFiles: UPLOAD_MAX_FILES,
+    accept: UPLOAD_ACCEPTED_FILES.join(","),
+    onFileReject(details) {
+      if (details.files.length > 0) {
+        toaster.create({
+          title: "Hiba történt feltöltés közben!",
+          description: `Maximum ${UPLOAD_MAX_FILES} fájlt tölthetsz fel.`,
+          type: "error",
+        });
+      }
+      return (details.files = []);
+    },
+  });
+
+  return (
+    <Stack
+      maxW={{ base: "lg", sm: "xl", lgTo2xl: "2xl" }}
+      w={"full"}
+      h={"full"}
+      display={"flex"}
+      flexDirection={"column"}
+      justifyContent={"center"}
+      mx={"auto"}
+      p={4}
+      alignItems={"center"}
+    >
+      <FileUpload.RootProvider value={fileUpload} w="full">
+        <FileUpload.HiddenInput />
+        <FileUpload.Dropzone
+          w={"full"}
+          backgroundColor={"teal.subtle"}
+          borderRadius={"l3"}
+          border={"1px solid"}
+          borderColor={"teal.muted"}
+          transition={"all 0.2s ease-in-out"}
+          cursor={"pointer"}
+          _hover={{ backgroundColor: "teal.muted" }}
+        >
+          <Icon size="2xl" color="teal.fg">
+            <LuUpload />
+          </Icon>
+          <FileUpload.DropzoneContent>
+            <Box>Húzza be a feltölteni kívánt fájlokat</Box>
+            <Box color="fg.muted" fontSize={"xs"} fontWeight={"light"}>
+              {UPLOAD_ACCEPTED_FILES.map((file) => {
+                return file.replaceAll("image/", "");
+              }).join(", ")}
+            </Box>
+          </FileUpload.DropzoneContent>
+        </FileUpload.Dropzone>
+        <Box overflowY={"scroll"} scrollbar={"hidden"} maxH={350} w={"full"}>
+          <FileUploadList />
+        </Box>
+      </FileUpload.RootProvider>
+      {fileUpload.acceptedFiles.length > 0 && (
+        <Button
+          w={"full"}
+          as="div"
+          onClick={() => {
+            setIsLoading(true);
+            if (!isLoading)
+              uploadFile({
+                fileUpload,
+                addImage,
+                setStep,
+                setSelectedImg,
+                setIsLoading,
+              });
+          }}
+          colorPalette="teal"
+          borderRadius={"l3"}
+          variant="surface"
+          loading={isLoading}
+          mt={3}
+          disabled={isLoading}
+          spinner={<BeatLoader size={12} color={"#004d40"} />}
+        >
+          Tovább
+        </Button>
+      )}
+    </Stack>
+  );
+}
