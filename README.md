@@ -75,7 +75,7 @@ Ezután a frontend a [http://localhost](http://localhost) címen érhető el. A 
 | [`docs/START_DEV.md`](docs/START_DEV.md) | Fejlesztői környezet indítása (Docker és Docker nélkül) |
 | Beépített útmutató (`/docs`, a „Leírás” menüpont) | Felhasználói guide: felület, menüpontok, billentyűparancsok, maszkolás, exportálás |
 | [`src/frontend/README.md`](src/frontend/README.md) | Frontend felépítés, a maszkrajzolás működése |
-| [`docs/kepszerkeszt-megertesehez.md`](docs/kepszerkeszt-megertesehez.md) | A fejlesztő saját jegyzetei a tervezéshez: az alkalmazott technológiák és képszerkesztési alapok (LUT, színkorrekció, HSV, levels, channel mixer, white balance, vibrance, GLSL). Tervezés közben készült személyes jegyzet, nem hivatalos dokumentáció. |
+| [`docs/kepszerkeszt-megertesehez.md`](docs/kepszerkeszt-megertesehez.md) | A saját jegyzeteim a tervezéshez: az alkalmazott technológiák és képszerkesztési alapok (LUT, színkorrekció, HSV, levels, channel mixer, white balance, vibrance, GLSL). Tervezés közben készült személyes jegyzet, nem hivatalos dokumentáció. |
 
 ## Projektszerkezet
 
