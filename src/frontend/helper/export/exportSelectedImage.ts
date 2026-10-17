@@ -66,7 +66,9 @@ export async function exportSelectedImage(
       (res) => res.blob(),
     );
 
-    copyrightImage = new File([copyrightBlob], `copyright_${selectedImage.id}`);
+    copyrightImage = new File([copyrightBlob], `copyright_${selectedImage.id}`, {
+      type: copyrightBlob.type,
+    });
   }
 
   // A copyright képnek a helyezetének lekérése

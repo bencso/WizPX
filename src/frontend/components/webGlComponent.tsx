@@ -44,10 +44,12 @@ export default function WebGlComponent() {
     renderSpriteRef,
     selectedLayer,
     setIsAppReady,
+    setOverlayVersion,
   } = useWorkSession();
   const { sessionData, setImageSize, addNewRenderTexture } = useSessionStore();
 
   const filtersRef = useRef<Container | null>(null);
+  const latestLoad = useRef(0);
 
   const lutFilter = useSessionStore(
     (state) =>
@@ -225,10 +227,13 @@ export default function WebGlComponent() {
       return;
     }
 
+    // Gyors képváltásnál egy lassabb, korábbi betöltés ne írja felül az újabbat
+    const loadId = ++latestLoad.current;
+
     const img = new Image();
 
     img.onload = async () => {
-      if (!appRef.current) return;
+      if (!appRef.current || loadId !== latestLoad.current) return;
 
       const source = new ImageSource({ resource: img });
       const texture = new Texture({ source });
@@ -280,6 +285,9 @@ export default function WebGlComponent() {
 
       updateLayout();
       setSelectLayer(0);
+
+      // az új overlay container üres: a szövegeket és az overlay képet újra ki kell rajzolni
+      setOverlayVersion((version) => version + 1);
     };
 
     if (sessionData.length > 0 && sessionData[selectedImg].blob)
@@ -291,6 +299,9 @@ export default function WebGlComponent() {
 
     const container = new Container();
     filtersRef.current = container;
+
+    // Képváltáskor az új képet be kell tölteni (a legelső betöltést a mount effekt végzi, ott az app még nincs kész)
+    if (appRef.current) loadImage();
 
     return () => {
       if (spriteRef.current) {

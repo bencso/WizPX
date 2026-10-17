@@ -58,8 +58,16 @@ export function createFormBody(
   formData.append("file", imageBlobFile);
   if (haldFile) formData.append("lut", haldFile, "hald.png");
 
-  if (copyrightImage)
-    formData.append("copyright_image", copyrightImage, "copyright.png");
+  if (copyrightImage) {
+    // a fájlnév a tényleges típust tükrözze (nem mindig PNG)
+    const copyrightExtension = copyrightImage.type.split("/")[1] || "png";
+
+    formData.append(
+      "copyright_image",
+      copyrightImage,
+      `copyright.${copyrightExtension}`,
+    );
+  }
 
   if (masksImages.length > 0) {
     for (let index = 0; index < masksImages.length; index++) {

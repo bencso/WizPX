@@ -237,7 +237,11 @@ export interface SessionStore {
   //#endregion
 
   //#region Copyright kép
-  saveCopyrightImage: (id: number, blob: ArrayBuffer) => void;
+  saveCopyrightImage: (
+    id: number,
+    blob: ArrayBuffer,
+    mimeType?: string,
+  ) => void;
   clearCopyrightImage: (id: number) => void;
   setCopyrightImagePosition: (
     id: number,
@@ -511,6 +515,8 @@ export interface WorkSessionContextProps {
   setIsDrawing: Dispatch<SetStateAction<boolean>>;
   appIsReady: boolean;
   setIsAppReady: Dispatch<SetStateAction<boolean>>;
+  overlayVersion: number;
+  setOverlayVersion: Dispatch<SetStateAction<number>>;
 }
 //#endregion
 

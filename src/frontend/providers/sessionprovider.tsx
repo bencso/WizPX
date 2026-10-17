@@ -40,6 +40,8 @@ export function WorkSessionProvider({ children }: WorkSessionProviderProps) {
   );
 
   const [appIsReady, setIsAppReady] = useState<boolean>(false);
+  // Minden képbetöltés után nő: ilyenkor új overlay container jön létre, a szövegeket / overlay képet újra kell rajzolni
+  const [overlayVersion, setOverlayVersion] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const spriteRef = useRef<Sprite | null>(null);
@@ -126,6 +128,8 @@ export function WorkSessionProvider({ children }: WorkSessionProviderProps) {
       setIsDrawing,
       appIsReady,
       setIsAppReady,
+      overlayVersion,
+      setOverlayVersion,
     }),
     [
       step,
@@ -159,6 +163,7 @@ export function WorkSessionProvider({ children }: WorkSessionProviderProps) {
       renderSpriteRef,
       isDrawing,
       appIsReady,
+      overlayVersion,
     ],
   );
 

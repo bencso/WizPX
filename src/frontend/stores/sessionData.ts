@@ -180,8 +180,12 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
     //#endregion
 
     //#region "Copyright" kép
-    saveCopyrightImage: async (id: number, blob: ArrayBuffer) => {
-      const blobConvert = new Blob([blob], { type: "image/png" });
+    saveCopyrightImage: async (
+      id: number,
+      blob: ArrayBuffer,
+      mimeType?: string,
+    ) => {
+      const blobConvert = new Blob([blob], { type: mimeType || "image/png" });
       const url = URL.createObjectURL(blobConvert);
 
       const size = await getImageSize(url);

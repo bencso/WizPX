@@ -33,6 +33,7 @@ export default function ImageWorkPlace() {
     textureRef,
     renderSpriteRef,
     appIsReady,
+    overlayVersion,
   } = useWorkSession();
 
   const { setCropBox, setTextPosition, setTextRelativePosition } =
@@ -103,6 +104,7 @@ export default function ImageWorkPlace() {
     scale,
     borderSize,
     draggableText,
+    overlayVersion,
   ]);
 
   useMask({

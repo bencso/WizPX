@@ -48,13 +48,21 @@ class WaterMarking:
     def watermark_with_image(self, watermark_image: Image.Image, watermark_size: int, watermark_opacity: int, border_size: int):
         SIZE = (watermark_size or 300, watermark_size or 300)        
         try:
-            watermark_image_png = watermark_image.convert("RGBA")
+            # Először a forgatás (EXIF), utána RGBA-ra alakítás: a korábbi sorrendben a convert eredményét
+            # azonnal felülírta az eredeti kép, így a palettás/átlátszó PNG-k alfája elveszett vagy hibázott
             watermark_image_png = ImageOps.exif_transpose(watermark_image)
+            watermark_image_png = watermark_image_png.convert("RGBA")
             watermark_image_png = ImageOps.cover(
                 watermark_image_png,
                 SIZE,
             )
-            watermark_image_png.putalpha(watermark_opacity)
+
+            # A beállított átlátszóság a kép saját alfájával szorzódik, nem írja felül (különben az átlátszó
+            # háttérű logó négyzetként jelenne meg)
+            alpha = watermark_image_png.getchannel("A").point(
+                lambda a: a * watermark_opacity // 255
+            )
+            watermark_image_png.putalpha(alpha)
 
             x, y = self.position
             if type(x) == int and type(y) == int:
@@ -81,4 +89,5 @@ class WaterMarking:
 
             return self.img
         except Exception as ex:
-            return f"Hiba: ${ex}"
+            # kivételt kell dobni: egy hibaüzenet-string képként továbbmenne az exportban
+            raise Exception(f"Az overlay kép feldolgozása sikertelen: {ex}") from ex

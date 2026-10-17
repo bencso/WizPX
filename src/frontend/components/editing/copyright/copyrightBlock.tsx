@@ -27,11 +27,21 @@ export default function CopyrightBlock() {
         const blob = await fetch(copyrightImage).then((r) => r.blob());
         const file = new File([blob], "uploadedCopyright");
         setUploadedFile(file);
+      } else {
+        // másik képre váltva ne maradjon az előző kép fájlneve
+        setUploadedFile(null);
       }
     })();
   }, [copyrightImage]);
 
   const uploadImage = uploadCopyrightImage(saveCopyrightImage, selectedImg);
+
+  // A feltöltő belső állapota (maxFiles: 1) képváltáskor és törléskor megmaradna, és a következő feltöltést
+  // „Maximum 1 fájl" hibával visszautasítaná. A kép a store-ban van, a feltöltőnek nem kell megőriznie.
+  useEffect(() => {
+    uploadImage.clearFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedImg, copyrightImage]);
 
   return (
     <Box>
