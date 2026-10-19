@@ -40,7 +40,7 @@ export const ToggleTip = React.forwardRef<HTMLDivElement, ToggleTipProps>(
               px="2"
               py="1"
               textStyle="xs"
-              rounded="sm"
+              
               ref={ref}
               {...contentProps}
             >

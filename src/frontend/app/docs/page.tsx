@@ -4,7 +4,6 @@ import { LeftSide } from "@/components/sidebar/leftside";
 import {
   Accordion,
   Alert,
-  Badge,
   Box,
   Card,
   Code,
@@ -55,7 +54,13 @@ const tabs = [
   { value: "faq", label: "Gyakori kérdések", icon: <LuCircleHelp /> },
 ];
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <Stack gap={4} py={4}>
       <Heading size="lg">{title}</Heading>
@@ -64,14 +69,28 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function StepList({ items }: { items: { title: string; description: string }[] }) {
+function StepList({
+  items,
+}: {
+  items: { title: string; description: string }[];
+}) {
   return (
-    <Steps.Root variant={"subtle"} orientation="vertical"  count={items.length} linear={false} defaultStep={-1}>
+    <Steps.Root
+      variant={"subtle"}
+      orientation="vertical"
+      count={items.length}
+      linear={false}
+      defaultStep={-1}
+    >
       <Steps.List>
         {items.map((step, index) => (
           <Steps.Item key={step.title} index={index} title={step.title}>
             <Steps.Indicator>
-              <Steps.Status complete={<LuCheck />} incomplete={<Steps.Number />} current={<Steps.Number />} />
+              <Steps.Status
+                complete={<LuCheck />}
+                incomplete={<Steps.Number />}
+                current={<Steps.Number />}
+              />
             </Steps.Indicator>
             <Box pb={4}>
               <Steps.Title>{step.title}</Steps.Title>
@@ -99,20 +118,22 @@ export default function DocsPage() {
       <Box flex={1} minH={0} overflowY="auto" bg="bg.muted/30">
         <Box maxW="1100px" mx="auto" p={{ base: 4, md: 8 }}>
           <HStack gap={3} mb={2}>
-            <Icon size="xl" color="teal.fg">
-              <LuBookOpen />
-            </Icon>
             <Heading size="3xl">WizPX útmutató</Heading>
           </HStack>
-          <Text color="fg.muted" mb={6}>
-            Minden, amit a szerkesztő használatához tudni kell: a felület részei, a menüpontok,
-            a billentyűparancsok és az exportálás.
+          <Text color="fg.muted" mt={"2"} mb={6}>
+            Minden, amit a szerkesztő használatához tudni kell: a felület
+            részei, a menüpontok, a billentyűparancsok és az exportálás.
           </Text>
 
-          <Tabs.Root defaultValue="start" colorPalette="teal" variant="subtle" lazyMount>
-            <Tabs.List flexWrap="wrap" rounded="l3" p={1} bg="bg.subtle">
+          <Tabs.Root
+            defaultValue="start"
+            colorPalette="teal"
+            variant="subtle"
+            lazyMount
+          >
+            <Tabs.List flexWrap="wrap" p={1} gap={"3"} bg="bg.subtle">
               {tabs.map((tab) => (
-                <Tabs.Trigger key={tab.value} value={tab.value} rounded="l2">
+                <Tabs.Trigger key={tab.value} value={tab.value}>
                   {tab.icon}
                   {tab.label}
                 </Tabs.Trigger>
@@ -127,8 +148,9 @@ export default function DocsPage() {
                   <Alert.Content>
                     <Alert.Title>A munkamenet a böngészőben él</Alert.Title>
                     <Alert.Description>
-                      A szerkesztések nincsenek elmentve. Az oldal frissítése vagy az Újrakezdés
-                      törli őket, ezért előtte exportáld az elkészült képeket.
+                      A szerkesztések nincsenek elmentve. Az oldal frissítése
+                      vagy az Újrakezdés törli őket, ezért előtte exportáld az
+                      elkészült képeket.
                     </Alert.Description>
                   </Alert.Content>
                 </Alert.Root>
@@ -157,7 +179,9 @@ export default function DocsPage() {
             <Tabs.Content value="menu">
               <Section title="Menüpontok">
                 <Text color="fg.muted">
-                  A szerkesztő jobb oldali menüjének funkciói. A címke mutatja, melyik rétegnél látszik a menüpont: a Kép (0. réteg) vagy egy új, maszkolható réteg. Kattints egy sorra a részletekért.
+                  A szerkesztő jobb oldali menüjének funkciói. A címke mutatja,
+                  melyik rétegnél látszik a menüpont: a Kép (0. réteg) vagy egy
+                  új, maszkolható réteg. Kattints egy sorra a részletekért.
                 </Text>
                 <Accordion.Root collapsible multiple variant="enclosed">
                   {menuGuides.map((menu) => (
@@ -167,16 +191,6 @@ export default function DocsPage() {
                         <Box flex="1">
                           <HStack gap={2} wrap="wrap">
                             <Text fontWeight="semibold">{menu.name}</Text>
-                            {menu.layers.includes("base") && (
-                              <Badge colorPalette="teal" variant="subtle">
-                                Kép réteg
-                              </Badge>
-                            )}
-                            {menu.layers.includes("layer") && (
-                              <Badge colorPalette="purple" variant="subtle">
-                                Új réteg
-                              </Badge>
-                            )}
                           </HStack>
                           <Text color="fg.muted" fontSize="sm">
                             {menu.summary}
@@ -202,8 +216,9 @@ export default function DocsPage() {
             <Tabs.Content value="mask">
               <Section title="Maszkolás részletesen">
                 <Text color="fg.muted">
-                  A maszkolás lehetővé teszi, hogy egy szűrő csak a kép egy részére hasson. A
-                  szerkesztés rétegekre épül: minden réteghez saját szűrők és saját maszk tartozik.
+                  A maszkolás lehetővé teszi, hogy egy szűrő csak a kép egy
+                  részére hasson. A szerkesztés rétegekre épül: minden réteghez
+                  saját szűrők és saját maszk tartozik.
                 </Text>
                 <StepList items={maskSteps} />
                 <Alert.Root status="warning" variant="subtle">
@@ -211,12 +226,12 @@ export default function DocsPage() {
                   <Alert.Content>
                     <Alert.Title>A 0. réteg (Kép) nem rajzolható</Alert.Title>
                     <Alert.Description>
-                      A 0. réteg a teljes képre ható alapréteg. Maszkot csak az új rétegeken lehet
-                      rajzolni.
+                      A 0. réteg a teljes képre ható alapréteg. Maszkot csak az
+                      új rétegeken lehet rajzolni.
                     </Alert.Description>
                   </Alert.Content>
                 </Alert.Root>
-                <Table.Root size="sm" variant="outline" rounded="l2">
+                <Table.Root size="sm" variant="outline">
                   <Table.Header>
                     <Table.Row>
                       <Table.ColumnHeader>Beállítás</Table.ColumnHeader>
@@ -225,16 +240,17 @@ export default function DocsPage() {
                   </Table.Header>
                   <Table.Body>
                     <Table.Row>
+                      <Table.Cell>Draw</Table.Cell>
                       <Table.Cell>
-                        <Badge colorPalette="teal">Draw</Badge>
+                        A rajzolt terület bekerül a maszkba, itt érvényesül a
+                        réteg szűrője.
                       </Table.Cell>
-                      <Table.Cell>A rajzolt terület bekerül a maszkba, itt érvényesül a réteg szűrője.</Table.Cell>
                     </Table.Row>
                     <Table.Row>
+                      <Table.Cell>Erase</Table.Cell>
                       <Table.Cell>
-                        <Badge colorPalette="red">Erase</Badge>
+                        A rajzolt terület kikerül a maszkból.
                       </Table.Cell>
-                      <Table.Cell>A rajzolt terület kikerül a maszkból.</Table.Cell>
                     </Table.Row>
                     <Table.Row>
                       <Table.Cell>Ecset mérete</Table.Cell>
@@ -242,7 +258,10 @@ export default function DocsPage() {
                     </Table.Row>
                     <Table.Row>
                       <Table.Cell>Ecset átmente</Table.Cell>
-                      <Table.Cell>Az ecset szélének puhasága: kisebb érték élesebb, nagyobb érték lágyabb átmenetet ad.</Table.Cell>
+                      <Table.Cell>
+                        Az ecset szélének puhasága: kisebb érték élesebb,
+                        nagyobb érték lágyabb átmenetet ad.
+                      </Table.Cell>
                     </Table.Row>
                   </Table.Body>
                 </Table.Root>
@@ -251,7 +270,7 @@ export default function DocsPage() {
 
             <Tabs.Content value="shortcuts">
               <Section title="Billentyűparancsok">
-                <Table.Root size="sm" variant="outline" rounded="l2">
+                <Table.Root size="sm" variant="outline">
                   <Table.Header>
                     <Table.Row>
                       <Table.ColumnHeader>Billentyű</Table.ColumnHeader>
@@ -273,14 +292,16 @@ export default function DocsPage() {
                           </HStack>
                         </Table.Cell>
                         <Table.Cell>{shortcut.description}</Table.Cell>
-                        <Table.Cell color="fg.muted">{shortcut.where}</Table.Cell>
+                        <Table.Cell color="fg.muted">
+                          {shortcut.where}
+                        </Table.Cell>
                       </Table.Row>
                     ))}
                   </Table.Body>
                 </Table.Root>
               </Section>
               <Section title="Egér">
-                <Table.Root size="sm" variant="outline" rounded="l2">
+                <Table.Root size="sm" variant="outline">
                   <Table.Header>
                     <Table.Row>
                       <Table.ColumnHeader>Művelet</Table.ColumnHeader>
@@ -290,7 +311,9 @@ export default function DocsPage() {
                   <Table.Body>
                     {mouseActions.map((item) => (
                       <Table.Row key={item.action}>
-                        <Table.Cell fontWeight="medium">{item.action}</Table.Cell>
+                        <Table.Cell fontWeight="medium">
+                          {item.action}
+                        </Table.Cell>
                         <Table.Cell>{item.description}</Table.Cell>
                       </Table.Row>
                     ))}
@@ -302,11 +325,12 @@ export default function DocsPage() {
             <Tabs.Content value="export">
               <Section title="Exportálás">
                 <Text color="fg.muted">
-                  Az <Code>Exportálás</Code> gomb a jobb oldali menü alján található. A kép
-                  előállítása a szerveren történik a beállított szűrőkkel, LUT-tal, maszkokkal,
-                  szövegekkel, overlay képpel és kerettel.
+                  Az <Code>Exportálás</Code> gomb a jobb oldali menü alján
+                  található. A kép előállítása a szerveren történik a beállított
+                  szűrőkkel, LUT-tal, maszkokkal, szövegekkel, overlay képpel és
+                  kerettel.
                 </Text>
-                <Table.Root size="sm" variant="outline" rounded="l2">
+                <Table.Root size="sm" variant="outline">
                   <Table.Header>
                     <Table.Row>
                       <Table.ColumnHeader>Beállítás</Table.ColumnHeader>
@@ -316,7 +340,9 @@ export default function DocsPage() {
                   <Table.Body>
                     {exportOptions.map((option) => (
                       <Table.Row key={option.name}>
-                        <Table.Cell fontWeight="medium">{option.name}</Table.Cell>
+                        <Table.Cell fontWeight="medium">
+                          {option.name}
+                        </Table.Cell>
                         <Table.Cell>{option.description}</Table.Cell>
                       </Table.Row>
                     ))}

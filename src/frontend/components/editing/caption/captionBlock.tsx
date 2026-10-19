@@ -221,7 +221,6 @@ export default function CaptionBlock() {
                       }}
                       colorScheme="teal"
                       size="lg"
-                      rounded="full"
                       css={{
                         scrollSnapAlign: "start",
                         flexShrink: 0,

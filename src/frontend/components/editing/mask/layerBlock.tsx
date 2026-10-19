@@ -1,4 +1,6 @@
 import {
+  AbsoluteCenter,
+  Box,
   Button,
   Grid,
   GridItem,
@@ -26,6 +28,7 @@ import { maskFiltersFragment } from "@/handlers/filters/maskFiltersFragment";
 import { applyFilters } from "@/helper/mask/applyFilters";
 import { destroyLayerResources } from "@/helper/mask/destroyLayer";
 import { requestRender } from "@/helper/render/requestRender";
+import { TbLayersSelected, TbSelect } from "react-icons/tb";
 
 //#region SIDEBAR ITEM
 export const MaskLayerBlock = () => {
@@ -229,23 +232,23 @@ const LayersAccordion = () => {
       {" "}
       {renderTextures && renderTextures.length > 0 && (
         <Accordion.Root
-          collapsible
           defaultValue={[activeLayer?.id.toString() ?? "0"]}
+          variant={"plain"}
+          captionSide={"top"}
+          gap={"2"}
         >
           {renderTextures.map((layer, index) => (
-            <Accordion.Item key={index} value={layer.id.toString()}>
-              <Accordion.ItemTrigger>
-                <Avatar.Root shape="rounded">
-                  <Avatar.Fallback name={layer.id.toString()} />
-                </Avatar.Root>
-                <HStack flex="1">{layer.id > 0 ? layer.id : "Kép"}</HStack>
-                <Accordion.ItemIndicator />
-              </Accordion.ItemTrigger>
-              <Accordion.ItemContent>
-                <Accordion.ItemBody>
+            <Accordion.Item key={index} value={layer.id.toString()} mt={"2"}>
+              <Box position="relative">
+                <Accordion.ItemTrigger>
+                  <HStack maxW={"150px"}>
+                    {layer.id > 0 ? layer.id + " réteg" : "Kép"}
+                  </HStack>
+                </Accordion.ItemTrigger>
+                <AbsoluteCenter axis="vertical" insetEnd="0">
                   <Grid
                     w={"full"}
-                    gap={2}
+                    gap={1}
                     gridTemplateColumns={
                       isMd
                         ? index > 0
@@ -271,9 +274,12 @@ const LayersAccordion = () => {
                           else setSelectLayer(layer.id);
                         }}
                       >
-                        {selectedLayer !== null && selectedLayer === layer.id
-                          ? "Kiválasztva " + layer.id
-                          : "Kiválasztás"}
+                        {selectedLayer !== null &&
+                        selectedLayer === layer.id ? (
+                          <TbSelect />
+                        ) : (
+                          <TbLayersSelected />
+                        )}
                       </Button>
                     </GridItem>
                     {index > 0 && (
@@ -307,13 +313,13 @@ const LayersAccordion = () => {
                             requestRender(appRef.current);
                           }}
                         >
-                          <LuTrash /> Törlés
+                          <LuTrash />
                         </Button>
                       </GridItem>
                     )}
                   </Grid>
-                </Accordion.ItemBody>
-              </Accordion.ItemContent>
+                </AbsoluteCenter>
+              </Box>
             </Accordion.Item>
           ))}
         </Accordion.Root>

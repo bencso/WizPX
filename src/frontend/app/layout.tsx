@@ -7,6 +7,7 @@ import { LangugeProvider } from "@/providers/languageprovider";
 import { WorkSessionProvider } from "@/providers/sessionprovider";
 import { Suspense } from "react";
 import { appFonts } from "../interfaces/appFonts.interface";
+import { chakra } from "@chakra-ui/react";
 
 export default function RootLayout({
   children,

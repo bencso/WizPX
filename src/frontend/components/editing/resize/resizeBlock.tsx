@@ -256,7 +256,7 @@ export default function ResizeBlock() {
         }}
       >
         <Tabs.List
-          rounded="l3"
+          
           p="1"
           w={"full"}
           display={"flex"}
@@ -268,7 +268,7 @@ export default function ResizeBlock() {
             value="no"
             w={"full"}
             display={"flex"}
-            rounded="l3"
+            
             justifyContent={"center"}
             opacity={1}
             disabled={expandMode === "no" || expandMode === "border"}
@@ -278,7 +278,7 @@ export default function ResizeBlock() {
           <Tabs.Trigger
             value="crop"
             w={"full"}
-            rounded="l3"
+            
             display={"flex"}
             justifyContent={"center"}
             opacity={1}
@@ -289,7 +289,7 @@ export default function ResizeBlock() {
           <Tabs.Trigger
             value="expand"
             w={"full"}
-            rounded="l3"
+            
             display={"flex"}
             justifyContent={"center"}
             opacity={1}
