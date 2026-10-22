@@ -273,6 +273,11 @@ async def savePreset(
         preset_data["allowed_infos"] = allowed_infos
         preset_data["optimize"] = optimize
         
+        return JSONResponse(
+                    status_code=200,
+                    content=json.dumps(preset_data)
+                )
+        
     except UploadLimitError as ex:
         return JSONResponse(
             status_code=413,
