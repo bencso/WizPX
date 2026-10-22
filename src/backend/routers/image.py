@@ -18,6 +18,8 @@ from functions.valid_colors import validColors
 import PIL
 from functions.watermark import WaterMarking
 import io
+from itsdangerous import URLSafeSerializer
+
 
 router = APIRouter(prefix="/images", tags=["images"])
 
@@ -273,10 +275,15 @@ async def savePreset(
         preset_data["allowed_infos"] = allowed_infos
         preset_data["optimize"] = optimize
         
+        prest_id_generator = URLSafeSerializer("presetwizpx")
+        preset_id = prest_id_generator.dumps(preset_data)
+        
         return JSONResponse(
                     status_code=200,
-                    content=json.dumps(preset_data)
-                )
+                    content={
+                        "preset_id": f"{preset_id}",
+                    },
+                    )
         
     except UploadLimitError as ex:
         return JSONResponse(

@@ -89,3 +89,4 @@ rignore
 sentry-sdk
 watchfiles
 yarg
+itsdangerous
