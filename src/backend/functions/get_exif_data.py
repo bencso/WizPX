@@ -41,7 +41,7 @@ class ExifDataHelper:
 
     def get_info(self) -> dict | None:
         try:
-            exif_datas = self.exif_data
+            exif_datas = self.exif_datsa
             if exif_datas is None:
                 return None
             image_list = list(map(str.lower, self.image_datas))
