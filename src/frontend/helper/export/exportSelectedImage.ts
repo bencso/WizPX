@@ -119,6 +119,11 @@ export async function exportSelectedImage(
     method: "POST",
     body: formBody,
   }).catch(() => null);
+   
+  await fetch(apiUrl("/images/preset"), {
+    method: "POST",
+    body: formBody,
+  }).catch(() => null);
 
   if (!res) {
     toaster.create({
