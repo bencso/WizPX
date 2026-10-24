@@ -36,7 +36,7 @@ cd WizPX/src
 
 ### 1. `.env` fájlok létrehozása
 
-A `compose.yml` mindkét szolgáltatásnál `env_file`-t vár, ezért a fájloknak léteznie kell. Másold le a mintákat:
+Másold le a mintákat:
 
 ```bash
 cp ./frontend/.env.example ./frontend/.env
@@ -46,7 +46,7 @@ cp ./backend/.env.example ./backend/.env
 > [!NOTE]
 > - `frontend/.env`: a `NEXT_PUBLIC_API_URL` a backend **teljes elérési alapja**, a frontend ehhez fűzi hozzá az útvonalat (`NEXT_PUBLIC_API_URL + /images/upload`, `/images/export`). Nginx mögött (Docker Compose, `http://localhost`) értéke `/api`, mert az nginx a `/api` előtagot leveszi és továbbítja a backendnek. A backendet közvetlenül is hívhatod (`NEXT_PUBLIC_API_URL=http://localhost:3001`), ilyenkor a böngészőből elérhető címet kell megadni (a Docker-belső `http://backend:3001` nem az), és CORS kell (lásd lent). A változó kötelező, nélküle a hívások a frontend saját útvonalára mennének.
 > - `backend/.env`: `CORS_ORIGINS` (vesszővel elválasztva) azok az origin-ek, amelyekről a böngésző közvetlenül hívhatja a backendet. Alapértelmezés: `http://localhost,http://localhost:3000`. Az nginx-en keresztüli hívásnál (`/api`) nincs szükség CORS-ra, mert egy origin-ről jön a frontend és az API is. A backend maga nem ismeri az `/api` előtagot. Ugyanitt állíthatók a feltöltési korlátok: `MAX_UPLOAD_MB` (fájlonként, alapértelmezés 100) és `MAX_IMAGE_MEGAPIXELS` (alapértelmezés 100). A korlát feletti feltöltésre a backend 413-as választ ad.
-> - A fájlok akkor is kellenek, ha üresek, mert a `compose.yml` `env_file`-ként hivatkozik rájuk.
+> - Az `.env` fájlok **opcionálisak**: ha hiányoznak, a konténerek az alapértelmezésekkel indulnak (`env_file`, `required: false`). A frontendnél viszont a `NEXT_PUBLIC_API_URL` nélkül az API-hívások nem találnák a backendet, ezért a frontend `.env`-t érdemes létrehozni.
 
 ---
 
@@ -84,7 +84,10 @@ docker compose logs -f
 ```
 
 > [!NOTE]
-> Kódfrissítéshez **volumes miatt** nem kell újra buildelni. Dockerfile vagy `package.json` / `requirements.txt` módosítása után viszont igen (`docker compose up --build`).
+> - Kódfrissítéshez **volumes miatt** nem kell újra buildelni. Dockerfile vagy `package.json` / `requirements.txt` módosítása után viszont igen.
+> - A frontend `node_modules` és `.next` mappája névtelen volume-ban él. Ha a függőségek változtak, az `up --build` mellé kell a `-V` (`--renew-anon-volumes`) kapcsoló is: `docker compose up --build -V`.
+> - A backend betűtípusai (`fonts/`, a szöveges exporthoz) a Docker image-ben vannak (`fonts-roboto` csomag), a mappa a repóban gitignore-olt. További betűtípushoz a `backend/Dockerfile.development`-ben a `fonts/` mappába másolós lépés mintájára vedd fel a fájlt, és építsd újra az image-et (`-V`-vel).
+> - A backend `healthcheck`-je a `/status` végpontot hívja, az nginx csak az egészséges backend után indul. Dockerfile vagy `package.json` / `requirements.txt` módosítása után viszont igen (`docker compose up --build`).
 
 ---
 

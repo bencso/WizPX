@@ -1,0 +1,12 @@
+# Titkok és helyi fájlok ne kerüljenek az image-be
+.env
+.env.*
+!.env.example
+
+__pycache__
+*.pyc
+.venv
+venv
+.git
+.gitignore
+Dockerfile*

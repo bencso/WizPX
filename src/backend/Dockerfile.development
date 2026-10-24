@@ -1,14 +1,32 @@
 FROM python:3.14
 
-WORKDIR /backend
+# Naplók azonnali kiírása, felesleges .pyc fájlok nélkül
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Rendszercsomagok a függőségek és a forráskód ELŐTT, így kódváltozásnál nem települnek újra
+#  - libvips-dev: a pyvips-hez
+#  - curl: a healthcheck-hez
+#  - fonts-roboto: a szöveges exporthoz használt betűtípus
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl libvips-dev fonts-roboto \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# A kódban a betűtípusok relatív útvonalon vannak (fonts/Roboto-Regular.ttf). Az image-be kerülnek, így
+# friss klónnál is megvannak (a fonts/ mappa gitignore-olt). További betűtípus hozzáadásához
+# ide másold a fájlt a find-os lépés mintájára.
+RUN mkdir -p /app/fonts \
+    && ROBOTO="$(find /usr/share/fonts -name 'Roboto-Regular.ttf' | head -n 1)" \
+    && test -n "$ROBOTO" \
+    && cp "$ROBOTO" /app/fonts/Roboto-Regular.ttf
 
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
-RUN apt-get update && apt-get install -y curl
 
 COPY . .
 
-RUN apt-get install -y libvips-dev
+EXPOSE 3001
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3001", "--reload"]

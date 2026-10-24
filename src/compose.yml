@@ -12,7 +12,8 @@ services:
     environment:
       WATCHPACK_POLLING: "true"
     env_file:
-      - ./frontend/.env.local
+      - path: ./frontend/.env
+        required: false
     restart: unless-stopped
     networks:
       - wizpx_app
@@ -23,17 +24,21 @@ services:
       dockerfile: Dockerfile.development
     volumes:
       - ./backend:/app
-    working_dir: /app
+      # Az image-ben telepített betűtípusok (fonts/) a bind mount alatt is megmaradnak
+      - /app/fonts
     ports:
       - 3001:3001
     env_file:
-      - ./backend/.env
+      - path: ./backend/.env
+        required: false
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "curl", "http://backend:3001" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      # -f: HTTP hibakódnál (pl. 404, 500) a curl hibával tér vissza, különben a check mindig sikeres lenne
+      test: [ "CMD", "curl", "-fsS", "http://localhost:3001/status" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       - wizpx_app
 
@@ -44,10 +49,11 @@ services:
       - 80:80
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./backend/images:/images:ro
     depends_on:
-      - backend
-      - frontend
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
     networks:
       - wizpx_app
 
