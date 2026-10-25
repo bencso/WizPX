@@ -41,7 +41,7 @@ export function createFormBody(
     exif_data: selectedImage.exportSettings?.exifDatas ?? [],
     border_size: selectedImage.borderSize?.x ?? 0,
     border_color: selectedImage.expandBackground ?? "#fff",
-    copyright_image_size: selectedImage.copyrightImage?.size?.width ?? 0,
+    copyright_image_size: selectedImage.copyrightImage?.size?.height ?? 0,
     copyright_image_position: cpImagePostion,
     copyright_image_opacity: selectedImage.copyrightImage?.opacity,
     texts: texts,

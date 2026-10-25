@@ -43,8 +43,9 @@ export function createCPImage(props: CreateCPImageProps) {
         ? { x: position.x, y: position.y }
         : undefined);
 
-    copyrightImageSprite.height = (copyrightImage.size?.height ?? 300) * scale;
-    copyrightImageSprite.width = (copyrightImage.size?.width ?? 300) * scale;
+        // TODO: Más a kép amit átad meg a  másik kép
+    copyrightImageSprite.height = (copyrightImage.size?.height ?? 0) * scale;
+    copyrightImageSprite.width = (copyrightImage.size?.width ?? 0) * scale;
 
     if (
       isXPositions(relativePosition?.x) &&

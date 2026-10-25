@@ -6,16 +6,16 @@ export const calculatePosition = (props: CalculationReFixPositionProps) => {
   if (!props.referenceElement.current) return;
   let x, y;
 
-  const height = props.referenceElement.current.offsetHeight / imageScale;
-  const width = props.referenceElement.current.offsetWidth / imageScale;
+  const imageHeight = props.referenceElement.current.offsetHeight / imageScale;
+  const imageWidth = props.referenceElement.current.offsetWidth / imageScale;
 
-  const imageHalf = width / 2 - props.elementRef.offsetWidth / 2;
+  const imageHalf = imageWidth / 2 - props.elementRef.offsetWidth / 2;
 
-  const imageWCP = width - props.elementRef.offsetWidth;
-  const imageHCP = height - props.elementRef.offsetHeight;
+  const copyrightImageX = imageWidth - props.elementRef.offsetWidth;
+  const copyrightImageY = imageHeight - props.elementRef.offsetHeight;
 
-  const bX = props.borderSize?.x ?? 30;
-  const bY = props.borderSize?.y ?? 30;
+  const bX = props.borderSize?.x ?? 30 / imageScale;
+  const bY = props.borderSize?.y ?? 30 / imageScale;
 
   x = props.positionX ?? bX;
   y = props.positionY ?? bY;
@@ -23,26 +23,26 @@ export const calculatePosition = (props: CalculationReFixPositionProps) => {
   const map: any = {
     left: {
       top: { x: bX, y: bY },
-      center: { x: bX, y: imageHCP / 2 },
-      bottom: { x: bX, y: imageHCP - bY },
+      center: { x: bX, y: copyrightImageY / 2 },
+      bottom: { x: bX, y: copyrightImageY - bY },
     },
     center: {
       top: { x: imageHalf, y: bY },
-      center: { x: imageHalf, y: imageHCP / 2 },
+      center: { x: imageHalf, y: copyrightImageY / 2 },
       bottom: {
         x: imageHalf,
-        y: imageHCP - bY,
+        y: copyrightImageY - bY,
       },
     },
     right: {
-      top: { x: imageWCP - bX, y: bY },
+      top: { x: copyrightImageX - bX, y: bY },
       center: {
-        x: imageWCP - bX,
-        y: imageHCP / 2,
+        x: copyrightImageX - bX,
+        y: copyrightImageY / 2,
       },
       bottom: {
-        x: imageWCP - bX,
-        y: imageHCP - bY,
+        x: copyrightImageX - bX,
+        y: copyrightImageY - bY,
       },
     },
   };

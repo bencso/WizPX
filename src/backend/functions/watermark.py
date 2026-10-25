@@ -47,6 +47,7 @@ class WaterMarking:
 
     def watermark_with_image(self, watermark_image: Image.Image, watermark_size: int, watermark_opacity: int, border_size: int):
         SIZE = (watermark_size or 300, watermark_size or 300)        
+        print(watermark_size)
         try:
             # Először a forgatás (EXIF), utána RGBA-ra alakítás: a korábbi sorrendben a convert eredményét
             # azonnal felülírta az eredeti kép, így a palettás/átlátszó PNG-k alfája elveszett vagy hibázott
@@ -63,6 +64,8 @@ class WaterMarking:
                 lambda a: a * watermark_opacity // 255
             )
             watermark_image_png.putalpha(alpha)
+            print("---asd---")
+            print(watermark_image_png.height, watermark_image_png.width)
 
             x, y = self.position
             if type(x) == int and type(y) == int:

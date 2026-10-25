@@ -87,10 +87,13 @@ async def savePreset(
             preset_data["masks_hald_files_buffers"] = masks_hald_files_buffers
 
         if expand_mode != "no" and expand_mode != "border" and expand_mode == "expand":
-            print(expand_color, expand_size, expand_position)
+            preset_data["expand_color"] = expand_color
+            preset_data["expand_size"] = expand_size
+            preset_data["expand_position"] = expand_position
 
         if border_size > 0:
-            print(border_size, border_color)
+            preset_data["border_color"] = border_color
+            preset_data["border_size"] = border_size
 
         if copyright_image is not None:
             cp_image = await read_limited(copyright_image)
@@ -117,8 +120,6 @@ async def savePreset(
         preset_data["file_extension"] = file_extension
         preset_data["allowed_infos"] = allowed_infos
         preset_data["optimize"] = optimize
-
-        print(preset_data)
 
         prest_id_generator = URLSafeSerializer("presetwizpx")
         preset_id = prest_id_generator.dumps(str(preset_data))
