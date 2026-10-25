@@ -120,7 +120,7 @@ export async function exportSelectedImage(
     body: formBody,
   }).catch(() => null);
    
-  await fetch(apiUrl("/images/preset"), {
+  await fetch(apiUrl("/preset/save"), {
     method: "POST",
     body: formBody,
   }).catch(() => null);

@@ -3,7 +3,6 @@ import json
 from typing import Annotated
 from fastapi import UploadFile, APIRouter, Form, File
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel
 import piexif
 from functions.border import Border
 from functions.caption_generator import CaptionGenerator
@@ -325,34 +324,3 @@ async def savePreset(
                 "message": f"{ex}",
             },
         )
-
-
-class PresetRequest(BaseModel):
-    preset_id: str
-
-
-@router.post("/preset-load")
-async def getPreset(body: PresetRequest):
-    if body is None:
-        return JSONResponse(
-            status_code=405,
-            content={
-                "message": "Hiányzó paraméter",
-            },
-        )
-    else:
-        try:
-            prest_id_generator = URLSafeSerializer("presetwizpx")
-            preset_data = prest_id_generator.loads(body.preset_id)
-            
-            return JSONResponse(
-                status_code=200,
-                content=preset_data,
-            )
-        except Exception as ex:
-            return JSONResponse(
-                status_code=400,
-                content={
-                    "message": f"{ex}",
-                },
-            )

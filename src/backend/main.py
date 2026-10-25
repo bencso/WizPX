@@ -3,10 +3,9 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from routers import image
+from routers import image, preset
 
 app = FastAPI()
-
 
 cors_origins = [
     origin.strip()
@@ -25,6 +24,7 @@ app.add_middleware(
 
 
 app.include_router(image.router)
+app.include_router(preset.router)
 
 @app.get("/status")
 def status():
