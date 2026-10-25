@@ -18,7 +18,7 @@ class LoadPresetBody(BaseModel):
 async def loadPreset(body: LoadPresetBody):
     if body is None:
         return JSONResponse(
-            status_code=405,
+            status_code=400,
             content={
                 "message": "Hiányzó paraméter",
             },
