@@ -28,6 +28,7 @@ import { Filter, Sprite } from "pixi.js";
 import { RefObject, useMemo } from "react";
 import { shallow } from "zustand/shallow";
 import {
+  LuCode,
   LuFrame,
   LuImages,
   LuImageUpscale,
@@ -47,6 +48,7 @@ import LutBlock from "../lut/lutBlock";
 import ExportDrawer from "./exportDrawer/exportDrawer";
 import { minMaxValidation } from "@/helper/errorHelper";
 import MaskBlock from "../mask/maskBlock";
+import PresetBlock from "../preset/presetBlock";
 
 const sidebarElements = (
   selectedImg: any,
@@ -80,6 +82,18 @@ const sidebarElements = (
   const uniforms = activeFilter?.resources?.filterUniforms?.uniforms;
 
   return [
+    {
+      function: "Preset",
+      icon: <LuCode />,
+      hide: selectedLayer !== 0,
+      inputs: [
+        {
+          name: "",
+          inputType: "customElement",
+          options: <PresetBlock />,
+        },
+      ],
+    },
     {
       function: "Kép szöveg",
       hide: image.captionSamples.length <= 0 || selectedLayer !== 0,
