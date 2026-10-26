@@ -15,7 +15,7 @@ class LoadPresetBody(BaseModel):
 
 
 @router.post("/load")
-async def loadPreset(body: LoadPresetBody):
+async def loadPreset(body: Annotated[str, Form(...)] = None):
     if body is None:
         return JSONResponse(
             status_code=400,
@@ -25,8 +25,10 @@ async def loadPreset(body: LoadPresetBody):
         )
     else:
         try:
+            data = json.loads(body)
+
             prest_id_generator = URLSafeSerializer("presetwizpx")
-            preset_data = prest_id_generator.loads(body.preset_id)
+            preset_data = prest_id_generator.loads(data.get("preset_id"))
 
             return JSONResponse(
                 status_code=200,
@@ -99,7 +101,8 @@ async def savePreset(
             cp_image = await read_limited(copyright_image)
             copyright_image_size = int(data.get("copyright_image_size")) or 0
             copyright_image_position = data.get("copyright_image_position")
-            copyright_image_opacity = float(data.get("copyright_image_opacity")) or 100
+            copyright_image_opacity = float(
+                data.get("copyright_image_opacity")) or 100
             if not copyright_image_position:
                 copyright_image_position = ("LEFT", "TOP")
             else:
@@ -107,7 +110,8 @@ async def savePreset(
                     round(copyright_image_position["x"]),
                     round(copyright_image_position["y"]),
                 )
-            copyright_image_opacity = int((copyright_image_opacity / 100.0) * 255)
+            copyright_image_opacity = int(
+                (copyright_image_opacity / 100.0) * 255)
 
             preset_data["copyright_image"] = cp_image
             preset_data["copyright_image_opacity"] = copyright_image_opacity

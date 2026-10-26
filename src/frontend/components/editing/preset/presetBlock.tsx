@@ -1,50 +1,33 @@
-import { minMaxValidation } from "@/helper/errorHelper";
-import { useWorkSession } from "@/providers/sessionprovider";
-import { useSessionStore } from "@/stores/sessionData";
-import {
-  Box,
-  Button,
-  ColorPicker,
-  Flex,
-  HStack,
-  Icon,
-  IconButton,
-  Input,
-  InputGroup,
-  NumberInput,
-  parseColor,
-  Portal,
-  RadioCard,
-  ScrollArea,
-  Tabs,
-  Text,
-  useBreakpointValue,
-} from "@chakra-ui/react";
+import { apiUrl } from "@/helper/api";
+import { Box, IconButton, Input, Text } from "@chakra-ui/react";
 import { useState } from "react";
-import { FaPinterest } from "react-icons/fa";
-import { LuFacebook, LuInstagram, LuUpload, LuX } from "react-icons/lu";
-import { shallow } from "zustand/shallow";
+import { LuUpload } from "react-icons/lu";
 
 export default function PresetBlock() {
-  const {
-    setExpandMode,
-    setExpandBackground,
-    setExpandSize,
-    setCropSave,
-    setCropBox,
-  } = useSessionStore();
-  const {
-    appRef,
-    spriteRef,
-    textureRef,
-    workPlaceRef,
-    selectedImg,
-    imageScale,
-    canvasRef,
-    selectedScale,
-  } = useWorkSession();
-
   const [presetValue, setPresetValue] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  async function usePreset() {
+    const body = {
+      preset_id: presetValue,
+    };
+    const formData = new FormData();
+
+    formData.append("body", JSON.stringify(body));
+
+    await fetch(apiUrl("/preset/load"), {
+      method: "POST",
+      body: formData,
+    })
+      .catch(() => null)
+      .then(async (e) => {
+        if (e && e.ok) {
+          const res = (await e.json()) ?? null;
+          console.log(res);
+        }
+      })
+      .finally(() => setLoading(false));
+  }
 
   return (
     <Box w={"full"} maxW={"300px"} minW={0}>
@@ -54,7 +37,17 @@ export default function PresetBlock() {
         onChange={(e) => setPresetValue(e.target.value)}
         variant="outline"
       />
-      <IconButton variant={"ghost"} onClick={() => {}}>
+      <IconButton
+        mt={"3"}
+        w={"full"}
+        variant={"surface"}
+        colorPalette={"teal"}
+        disabled={loading}
+        onClick={() => {
+          setLoading(true);
+          usePreset();
+        }}
+      >
         <LuUpload /> <Text>Alkalmazás</Text>
       </IconButton>
     </Box>
