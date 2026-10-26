@@ -11,6 +11,10 @@ services:
       - /app/.next
     environment:
       WATCHPACK_POLLING: "true"
+      # Alacsony-memória mód: kikapcsolja a webpack memóriában tartott gyorsítótárát (kb. 600 MB-tal kevesebb)
+      NEXT_DEV_LOW_MEMORY: "true"
+    # A fejlesztői szerver 3-3,5 GB-ot használ; a korlát megakadályozza, hogy a gép többi részét is felzabálja
+    mem_limit: ${FRONTEND_MEM_LIMIT:-4500m}
     env_file:
       - path: ./frontend/.env
         required: false
@@ -32,6 +36,8 @@ services:
       - path: ./backend/.env
         required: false
     restart: unless-stopped
+    # Nyugalmi állapotban ~300 MB; egy 24 megapixeles export csúcsa kb. 1 GB, nagyobb képnél arányosan több
+    mem_limit: ${BACKEND_MEM_LIMIT:-4g}
     healthcheck:
       # -f: HTTP hibakódnál (pl. 404, 500) a curl hibával tér vissza, különben a check mindig sikeres lenne
       test: [ "CMD", "curl", "-fsS", "http://localhost:3001/status" ]
@@ -45,6 +51,7 @@ services:
   nginx:
     image: nginx:alpine
     restart: unless-stopped
+    mem_limit: 128m
     ports:
       - 80:80
     volumes:

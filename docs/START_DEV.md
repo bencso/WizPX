@@ -91,6 +91,26 @@ docker compose logs -f
 
 ---
 
+### Memóriahasználat
+
+A mért értékek (Docker nélkül, ugyanazzal a kóddal):
+
+| Szolgáltatás | Memória | Megjegyzés |
+|---|---|---|
+| Frontend (`next dev`, webpack) | kb. 3,0-3,5 GB | két oldal lefordítása után, fájlmódosításkor lassan tovább nő. A `NEXT_DEV_LOW_MEMORY` mód kb. 600 MB-tal kevesebbet használ. |
+| Backend (FastAPI) | kb. 300 MB nyugalmi | egy 24 megapixeles export csúcsa kb. 1 GB (maszkokkal), utána visszaáll ~450 MB-ra, nem szivárog |
+| nginx | néhány MB | |
+
+A `compose.yml` korlátot állít a konténerekre (`FRONTEND_MEM_LIMIT`, alapértelmezés 4500 MB; `BACKEND_MEM_LIMIT`, alapértelmezés 4 GB), hogy a fejlesztői szerver ne foglalja le az egész gépet. A korlátok az `src/.env` fájlban (vagy környezeti változóval) állíthatók át.
+
+> [!TIP]
+> Ha a Docker összességében sokkal többet foglal, mint ez, az általában nem a konténerek, hanem a **Docker Desktop virtuális gépe** (a fájlgyorsítótár és a lefoglalt memória): állítsd be a Docker Desktop **Settings → Resources → Memory** értékét (pl. 6-8 GB), Windowson WSL2-nél a `%UserProfile%\.wslconfig` fájlban a `memory=6GB` sort. A konténerek tényleges használatát a `docker stats` mutatja.
+
+> [!NOTE]
+> A webpack helyett Turbopackkel (`next dev` `--webpack` nélkül) a mérés szerint kb. 2,0 GB elég lenne, de az alkalmazás alatta még nem működik hibátlanul (hydration hiba), ezért a `--webpack` marad.
+
+---
+
 ### Konténerek leállítása / újraindítása
 
 ```bash
