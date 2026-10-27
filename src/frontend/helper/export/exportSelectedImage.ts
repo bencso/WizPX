@@ -1,8 +1,6 @@
 import { toaster } from "@/components/ui/toaster";
 import { apiUrl } from "@/helper/api";
-import {
-  CustomImage,
-} from "@/interfaces/interface";
+import { CustomImage } from "@/interfaces/interface";
 import { Application, Renderer, Sprite, Texture, TextureSource } from "pixi.js";
 import { Dispatch, RefObject, SetStateAction } from "react";
 import { exportMasks } from "./exportMasks";
@@ -66,9 +64,13 @@ export async function exportSelectedImage(
       (res) => res.blob(),
     );
 
-    copyrightImage = new File([copyrightBlob], `copyright_${selectedImage.id}`, {
-      type: copyrightBlob.type,
-    });
+    copyrightImage = new File(
+      [copyrightBlob],
+      `copyright_${selectedImage.id}`,
+      {
+        type: copyrightBlob.type,
+      },
+    );
   }
 
   // A copyright képnek a helyezetének lekérése
@@ -119,7 +121,7 @@ export async function exportSelectedImage(
     method: "POST",
     body: formBody,
   }).catch(() => null);
-   
+
   await fetch(apiUrl("/preset/save"), {
     method: "POST",
     body: formBody,

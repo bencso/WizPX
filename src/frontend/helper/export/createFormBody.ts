@@ -1,7 +1,7 @@
 import { ExportText } from "@/interfaces/exportTexts.interface";
 import { CustomImage } from "@/interfaces/interface";
 
-export function createFormBody(
+export async function createFormBody(
   selectedImage: CustomImage,
   cpImagePostion:
     | {
@@ -79,15 +79,9 @@ export function createFormBody(
   }
 
   if (masksImageHalds.length > 0) {
-    for (let index = 0; index < masksImageHalds.length; index++) {
-      const haldImage = masksImageHalds[index];
-
-      const haldImageFile = new File([haldImage], `mask_hald_${index}`);
-      formData.append(
-        `masks_hald_files`,
-        haldImageFile,
-        `mask_hald_${index}.png`,
-      );
+    for (const [index, maskImage] of masksImages.entries()) {
+      const blob = await (await fetch(maskImage)).blob();
+      formData.append("masks_files", blob, `mask_${index}.png`);
     }
   }
 

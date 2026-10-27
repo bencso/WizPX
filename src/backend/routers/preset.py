@@ -1,3 +1,4 @@
+import base64
 import json
 from typing import Annotated
 from fastapi import UploadFile, APIRouter, Form, File
@@ -15,8 +16,8 @@ class LoadPresetBody(BaseModel):
 
 
 @router.post("/load")
-async def loadPreset(body: Annotated[str, Form(...)] = None):
-    if body is None:
+async def loadPreset(preset_id: Annotated[UploadFile, File()]):
+    if preset_id is None:
         return JSONResponse(
             status_code=400,
             content={
@@ -25,10 +26,8 @@ async def loadPreset(body: Annotated[str, Form(...)] = None):
         )
     else:
         try:
-            data = json.loads(body)
-
-            prest_id_generator = URLSafeSerializer("presetwizpx")
-            preset_data = prest_id_generator.loads(data.get("preset_id"))
+            token = (await read_limited(preset_id)).decode("ascii")
+            preset_data = URLSafeSerializer("presetwizpx").loads(token)
 
             return JSONResponse(
                 status_code=200,
@@ -69,20 +68,26 @@ async def savePreset(
         expand_position = data.get("expand_position") or None
         masks_number = data.get("masks_number") or 0
 
-        if masks_files is not None and len(masks_files) > 0:
+        masks_files_buffers = []
+        masks_hald_files_buffers = []
+
+        if masks_files:
             masks_files_buffers = [
-                await read_limited(mask_file) for mask_file in masks_files
+                base64.b64encode(await read_limited(f)).decode("ascii")
+                for f in masks_files
             ]
 
-        if masks_hald_files is not None and len(masks_hald_files) > 0:
+        if masks_hald_files:
             masks_hald_files_buffers = [
-                await read_limited(mask_hald_file)
-                for mask_hald_file in masks_hald_files
+                base64.b64encode(await read_limited(f)).decode("ascii")
+                for f in masks_hald_files
             ]
 
         if lut:
             lut_file_bytes = await read_limited(lut)
-            preset_data["lut_file_bytes"] = lut_file_bytes
+            preset_data["lut_file_bytes"] = base64.b64encode(
+                lut_file_bytes
+            ).decode("ascii")
 
         if masks_number > 0:
             preset_data["masks_files_buffers"] = masks_files_buffers
@@ -126,13 +131,12 @@ async def savePreset(
         preset_data["optimize"] = optimize
 
         prest_id_generator = URLSafeSerializer("presetwizpx")
-        preset_id = prest_id_generator.dumps(str(preset_data))
+        preset_id = prest_id_generator.dumps(json.dumps(preset_data, default=lambda x: base64.b64encode(
+            x).decode("ascii") if isinstance(x, bytes) else x))
 
         return JSONResponse(
             status_code=200,
-            content={
-                "preset_id": f"{preset_id}",
-            },
+            content={"preset_id": preset_id},
         )
 
     except UploadLimitError as ex:
