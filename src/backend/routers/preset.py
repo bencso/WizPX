@@ -69,7 +69,7 @@ async def savePreset(
         masks_number = data.get("masks_number") or 0
 
         masks_files_buffers = []
-        masks_hald_files_buffers = []
+        s_masks_hald_files_buffers = []
 
         if masks_files:
             masks_files_buffers = [
@@ -78,7 +78,7 @@ async def savePreset(
             ]
 
         if masks_hald_files:
-            masks_hald_files_buffers = [
+            s_masks_hald_files_buffers = [
                 base64.b64encode(await read_limited(f)).decode("ascii")
                 for f in masks_hald_files
             ]
@@ -91,7 +91,7 @@ async def savePreset(
 
         if masks_number > 0:
             preset_data["masks_files_buffers"] = masks_files_buffers
-            preset_data["masks_hald_files_buffers"] = masks_hald_files_buffers
+            preset_data["masks_hald_files_buffers"] = s_masks_hald_files_buffers
 
         if expand_mode != "no" and expand_mode != "border" and expand_mode == "expand":
             preset_data["expand_color"] = expand_color

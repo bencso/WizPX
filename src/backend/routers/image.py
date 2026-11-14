@@ -101,6 +101,8 @@ async def exportImage(
                 await read_limited(mask_file) for mask_file in masks_files
             ]
 
+        masks_hald_files_buffers = []
+        
         if masks_hald_files is not None and len(masks_hald_files) > 0:
             masks_hald_files_buffers = [
                 await read_limited(mask_hald_file)

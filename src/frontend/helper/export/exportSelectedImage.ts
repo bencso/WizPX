@@ -88,9 +88,9 @@ export async function exportSelectedImage(
   // Hald kép nélkül nem küldünk LUT-ot (a backend LUT nélkül is exportál)
   const haldFile = haldImage
     ? new File(
-        [await fetch(haldImage).then((res) => res.blob())],
-        `hald_${selectedImage.id}`,
-      )
+      [await fetch(haldImage).then((res) => res.blob())],
+      `hald_${selectedImage.id}`,
+    )
     : null;
 
   let texts: (ExportText | undefined)[] = [];
@@ -106,7 +106,7 @@ export async function exportSelectedImage(
     if (curtexts) texts = curtexts;
   }
 
-  let formBody = createFormBody(
+  let formBody = await createFormBody(
     selectedImage,
     cpImagePostion,
     texts,
@@ -117,6 +117,8 @@ export async function exportSelectedImage(
     copyrightImage,
   );
 
+  if (!formBody) return;
+
   const res = await fetch(apiUrl("/images/export"), {
     method: "POST",
     body: formBody,
@@ -126,6 +128,7 @@ export async function exportSelectedImage(
     method: "POST",
     body: formBody,
   }).catch(() => null);
+
 
   if (!res) {
     toaster.create({
