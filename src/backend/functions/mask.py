@@ -6,6 +6,13 @@ import io
 class Mask:
     def __init__(self,image):
         self.image = image
+        
+    
+    @staticmethod
+    def _png_bytes(data: bytes) -> bytes:
+        if data.startswith(b"data:"):
+            return base64.b64decode(data.split(b",", 1)[1])
+        return data
     
     def apply(self, mask_file, mask_hald_file):
         _, m_encoded = mask_file.split(b",", 1)

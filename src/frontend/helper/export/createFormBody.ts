@@ -73,15 +73,15 @@ export async function createFormBody(
     for (let index = 0; index < masksImages.length; index++) {
       const mask = masksImages[index];
 
-      const maskFile = new File([mask], `mask_${index}`);
+      const maskFile = new File([await (await fetch(mask)).blob()], `mask_${index}`);
       formData.append(`masks_files`, maskFile, `mask_${index}.png`);
     }
   }
 
   if (masksImageHalds.length > 0) {
-    for (const [index, maskImage] of masksImages.entries()) {
-      const blob = await (await fetch(maskImage)).blob();
-      formData.append("masks_files", blob, `mask_${index}.png`);
+    for (const [index, maskImageHald] of masksImageHalds.entries()) {
+      const blob = await (await fetch(maskImageHald)).blob();
+      formData.append("masks_hald_files", blob, `mask_${index}.png`);
     }
   }
 

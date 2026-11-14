@@ -12,6 +12,7 @@ import { useWorkSession } from "@/providers/sessionprovider";
 export default function PresetBlock() {
   const [presetValue, setPresetValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const setBorderSize = useSessionStore((s) => s.setBorderSize);
 
   const { setLut } = useSessionStore();
   const { selectedImg } = useWorkSession();
@@ -62,11 +63,13 @@ export default function PresetBlock() {
       }
 
       if (data) {
-        const masks_halds = data.masks_files_buffers;
-        console.log(masks_halds);
-
-        if (masks_halds.length > 0) {
-          const cubeText = await stripPngToCube(masks_halds[0]);
+        const masksImages = data.masks_files_buffers;
+        const masksHalds = data.masks_hald_files_buffers;
+        const borderSize = data["border_size"] ?? 0;
+        console.log(data);
+        
+        if (masksHalds.length > 0) {
+          const cubeText = await stripPngToCube(masksHalds[0]);
           const lut = parseCubeLUT(cubeText);
           const lutFilter = convertCubeToFilter(lut) as ColorMapFilter;
 
@@ -75,6 +78,15 @@ export default function PresetBlock() {
           });
           setLut(selectedImg, lutFilter, lutFile);
         }
+
+        if(borderSize && borderSize !== 0){
+          console.log(borderSize);
+          setBorderSize(selectedImg, {
+            x: borderSize,
+            y: borderSize
+          });
+        }
+        
       }
     }
   }

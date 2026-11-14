@@ -300,9 +300,9 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
         sessionData: state.sessionData.map((img: any) =>
           img.id === id
             ? {
-                ...img,
-                dimesions: { width, height },
-              }
+              ...img,
+              dimesions: { width, height },
+            }
             : img,
         ),
       })),
@@ -377,9 +377,9 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
         const image = state.sessionData.find((img: any) => img.id === imageId);
         const imageScale = Math.min(
           (referenceElement.current?.clientHeight ?? 0) /
-            (image?.dimesions?.height ?? 0),
+          (image?.dimesions?.height ?? 0),
           (referenceElement.current?.clientWidth ?? 0) /
-            (image?.dimesions?.width ?? 0),
+          (image?.dimesions?.width ?? 0),
         );
 
         if (image) {
@@ -647,12 +647,12 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
         sessionData: state.sessionData.map((img: any) =>
           img.id === id
             ? {
-                ...img,
-                exportSettings: {
-                  ...img.exportSettings,
-                  optimize: optimize,
-                },
-              }
+              ...img,
+              exportSettings: {
+                ...img.exportSettings,
+                optimize: optimize,
+              },
+            }
             : img,
         ),
       }));
@@ -677,12 +677,12 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
         sessionData: state.sessionData.map((img: any) =>
           img.id === id
             ? {
-                ...img,
-                exportSettings: {
-                  ...img.exportSettings,
-                  fileExtension: extension,
-                },
-              }
+              ...img,
+              exportSettings: {
+                ...img.exportSettings,
+                fileExtension: extension,
+              },
+            }
             : img,
         ),
       }));
@@ -705,12 +705,12 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
         sessionData: state.sessionData.map((img: any) =>
           img.id === id
             ? {
-                ...img,
-                exportSettings: {
-                  ...img.exportSettings,
-                  exifDatas: exifs,
-                },
-              }
+              ...img,
+              exportSettings: {
+                ...img.exportSettings,
+                exifDatas: exifs,
+              },
+            }
             : img,
         ),
       }));
@@ -776,12 +776,12 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
               index !== selectedLayer
                 ? layer
                 : {
-                    ...layer,
-                    filters: {
-                      ...layer.filters,
-                      [filterName]: Number(value),
-                    },
+                  ...layer,
+                  filters: {
+                    ...layer.filters,
+                    [filterName]: Number(value),
                   },
+                },
             ),
           };
         }),
@@ -890,13 +890,12 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
       borderSize.x = minMaxValidation(borderSize.x, 0);
       borderSize.y = minMaxValidation(borderSize.y, 0);
 
-      set((state) => {
-        const image = state.sessionData.find((img) => img.id === id);
 
-        if (!image) return;
-
-        image.borderSize = borderSize;
-      });
+      set((state) => ({
+        sessionData: state.sessionData.map((img: any) =>
+          img.id === id ? { ...img, borderSize: borderSize } : img,
+        ),
+      }));
     },
     //#endregion
     //#region LUT
