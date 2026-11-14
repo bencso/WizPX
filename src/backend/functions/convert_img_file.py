@@ -9,31 +9,30 @@ from typing import Optional
 import time
 from io import BytesIO
 
+
 class Export:
     def __init__(
         self,
         image: Image.Image,
         output_extension: str,  # pyright: ignore[reportInvalidTypeForm]
-        exif_data: Optional[any] ,
-        allowed_infos: Optional[list[
-            EXIF_TAG_NAMES_LIST  # pyright: ignore[reportInvalidTypeForm]
-        ]],
+        exif_data: Optional[any],
+        allowed_infos: Optional[
+            list[EXIF_TAG_NAMES_LIST]  # pyright: ignore[reportInvalidTypeForm]
+        ],
         optimized: Optional[bool],
     ) -> str:
         self.image = image
         print(allowed_infos)
         self.allowed_info = (
-            allowed_infos
-            if allowed_infos and len(allowed_infos) > 0
-            else []
+            allowed_infos if allowed_infos and len(allowed_infos) > 0 else []
         )
         self.output_extension = output_extension
         self.exif_data = exif_data
         self.optimized = True if optimized else False
-    
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, *args):
         self.buffer = io.BytesIO()
         self.image.save(self.buffer, format="PNG")
@@ -59,26 +58,30 @@ class Export:
                 if "thumbnail" in allowed_set:
                     filtered_exif["thumbnail"] = self.exif_data.get("thumbnail", None)
                 exif_bytes = piexif.dump(filtered_exif)
-                
+
             ext = self.output_extension or self.f_ext
             ext = ext.lstrip(".")
-            if ext == "jpg": ext = "jpeg"
-            
-            # BASE_DIR = Path(__file__).resolve().parent.parent
-            # UPLOAD_DIR = BASE_DIR / "images"
-            
-            # if not os.path.exists(UPLOAD_DIR): os.mkdir(UPLOAD_DIR)
-            # file_name = f"{uuid.uuid4().hex}.{ext}"
-            
+            if ext == "jpg":
+                ext = "jpeg"
+
             if exif_bytes and self.optimized is not True:
                 exif = exif_bytes
             else:
-                exif=piexif.dump({})
-            
+                exif = piexif.dump({})
+
             buffer = BytesIO()
+
+            if ext in ("jpeg", "bmp") and self.image.mode in ("RGBA", "LA", "P"):
+                background = Image.new("RGB", self.image.size, (255, 255, 255))
+                background.paste(
+                    self.image.convert("RGBA"),
+                    mask=self.image.convert("RGBA").getchannel("A"),
+                )
+                self.image = background
+
             if self.optimized is True:
                 self.image.save(buffer, exif=exif, format=ext, quality=40)
-            else: 
+            else:
                 self.image.save(buffer, exif=exif, format=ext)
             return buffer.getvalue()
         except Exception as e:
