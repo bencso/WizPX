@@ -15,11 +15,8 @@ class Mask:
         return data
     
     def apply(self, mask_file, mask_hald_file):
-        _, m_encoded = mask_file.split(b",", 1)
-        _, mh_encoded = mask_hald_file.split(b",", 1)   
-                     
-        decoded_mask = base64.b64decode(m_encoded)
-        decoded_hald = base64.b64decode(mh_encoded)
+        decoded_mask = self._png_bytes(mask_file)
+        decoded_hald = self._png_bytes(mask_hald_file)
 
         original = self.image.copy()
         original = original.convert("RGBA")
