@@ -13,8 +13,8 @@ export default function PresetBlock() {
   const [presetValue, setPresetValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { setLut, setBorderSize, setExpandBackground, setExportFileOptimize, setExportFileExtension } = useSessionStore();
-  const { selectedImg } = useWorkSession();
+  const { setLut, setBorderSize, setExpandBackground, setExportFileOptimize, setExportFileExtension, setExpandMode, setExpandSize, setCopyrightImageOpacity, setCopyrightImagePosition, setCopyrightImageSize } = useSessionStore();
+  const { selectedImg, imageScale } = useWorkSession();
 
   async function usePreset() {
     const body = {
@@ -64,11 +64,22 @@ export default function PresetBlock() {
       if (data) {
         const masksImages = data.masks_files_buffers;
         const masksHalds = data.masks_hald_files_buffers;
+
         const borderSize = data["border_size"] ?? 0;
-        const borderColor = data["border_color"] ?? "#fff";
+        const borderColor = data["border_color"] ?? null;
+
         const isOptimize = data["optimize"] ?? false;
         const exportFileExt = data["file_extension"] ?? "jpg";
-        console.log(data);
+
+        const expandMode = data["expand_mode"] ?? "no";
+        const expandSize = data["expand_size"] ?? null;
+        const expandPostion = data["expand_position"] ?? null;
+        const expandColor = data["expand_color"] ?? null;
+
+        const copyrightImageOpacity = data["copyright_image_opacity"] ?? null;
+        const copyrightImagePosition = data["copyright_image_position"] ?? null;
+        const copyrightImageSize = data["copyright_image_size"] ?? null;
+
 
         if (masksHalds.length > 0) {
           const cubeText = await stripPngToCube(masksHalds[0]);
@@ -97,8 +108,17 @@ export default function PresetBlock() {
 
         if (exportFileExt) setExportFileExtension(selectedImg, exportFileExt)
 
+        if (expandMode)
+          setExpandMode(selectedImg, expandMode);
+        if (expandColor) setExpandBackground(selectedImg, expandColor)
+        if (expandSize) {
+          if (expandPostion) setExpandSize(selectedImg, expandSize, expandPostion);
+          else setExpandSize(selectedImg, expandSize);
+        }
 
-
+        if (copyrightImageOpacity) setCopyrightImageOpacity(selectedImg, copyrightImageOpacity);
+        if (copyrightImagePosition) setCopyrightImagePosition(selectedImg, copyrightImagePosition, imageScale);
+        if (copyrightImageSize) setCopyrightImageSize(selectedImg, copyrightImageSize);
       }
     }
   }
