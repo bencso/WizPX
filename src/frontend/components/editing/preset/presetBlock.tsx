@@ -12,9 +12,8 @@ import { useWorkSession } from "@/providers/sessionprovider";
 export default function PresetBlock() {
   const [presetValue, setPresetValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const setBorderSize = useSessionStore((s) => s.setBorderSize);
 
-  const { setLut } = useSessionStore();
+  const { setLut, setBorderSize, setExpandBackground, setExportFileOptimize, setExportFileExtension } = useSessionStore();
   const { selectedImg } = useWorkSession();
 
   async function usePreset() {
@@ -66,8 +65,11 @@ export default function PresetBlock() {
         const masksImages = data.masks_files_buffers;
         const masksHalds = data.masks_hald_files_buffers;
         const borderSize = data["border_size"] ?? 0;
+        const borderColor = data["border_color"] ?? "#fff";
+        const isOptimize = data["optimize"] ?? false;
+        const exportFileExt = data["file_extension"] ?? "jpg";
         console.log(data);
-        
+
         if (masksHalds.length > 0) {
           const cubeText = await stripPngToCube(masksHalds[0]);
           const lut = parseCubeLUT(cubeText);
@@ -79,14 +81,24 @@ export default function PresetBlock() {
           setLut(selectedImg, lutFilter, lutFile);
         }
 
-        if(borderSize && borderSize !== 0){
+        if (borderSize !== 0) {
           console.log(borderSize);
           setBorderSize(selectedImg, {
             x: borderSize,
             y: borderSize
           });
         }
-        
+
+        if (borderColor)
+          setExpandBackground(selectedImg, borderColor);
+
+        if (isOptimize)
+          setExportFileOptimize(selectedImg, isOptimize)
+
+        if (exportFileExt) setExportFileExtension(selectedImg, exportFileExt)
+
+
+
       }
     }
   }
