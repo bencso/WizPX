@@ -13,7 +13,7 @@ export default function PresetBlock() {
   const [presetValue, setPresetValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { setLut, setBorderSize, setExpandBackground, setExportFileOptimize, setExportFileExtension, setExpandMode, setExpandSize, setCopyrightImageOpacity, setCopyrightImagePosition, setCopyrightImageSize } = useSessionStore();
+  const { setLut, setBorderSize, setExpandBackground, setExportFileOptimize, setExportFileExtension, setExpandMode, setExpandSize, setCopyrightImageOpacity, setCopyrightImagePosition, setCopyrightImageSize, saveCopyrightImage } = useSessionStore();
   const { selectedImg, imageScale } = useWorkSession();
 
   async function usePreset() {
@@ -62,8 +62,26 @@ export default function PresetBlock() {
       }
 
       if (data) {
+        /*
+      export interface ExportText {
+        uiWidth: number;
+        uiAscent: number;
+        uiDescent: number;
+        id: string;
+        text: string;
+        position: DraggableImageEventPosition;
+        relativePosition?: { x: XPositions | number; y: YPositions | number };
+        enabled: boolean;
+        fontSize: number;
+        fontFamily: string;
+        fontWeight: number;
+        color: string;
+        opacity: number;
+      }
+        */
         const masksImages = data.masks_files_buffers;
         const masksHalds = data.masks_hald_files_buffers;
+        const copyrightImage = data.copyright_image;
 
         const borderSize = data["border_size"] ?? 0;
         const borderColor = data["border_color"] ?? null;
@@ -116,9 +134,13 @@ export default function PresetBlock() {
           else setExpandSize(selectedImg, expandSize);
         }
 
-        if (copyrightImageOpacity) setCopyrightImageOpacity(selectedImg, copyrightImageOpacity);
-        if (copyrightImagePosition) setCopyrightImagePosition(selectedImg, copyrightImagePosition, imageScale);
-        if (copyrightImageSize) setCopyrightImageSize(selectedImg, copyrightImageSize);
+        if (copyrightImage) {
+          saveCopyrightImage(selectedImg, copyrightImage);
+
+          if (copyrightImageOpacity) setCopyrightImageOpacity(selectedImg, copyrightImageOpacity);
+          if (copyrightImagePosition) setCopyrightImagePosition(selectedImg, copyrightImagePosition, imageScale);
+          if (copyrightImageSize) setCopyrightImageSize(selectedImg, copyrightImageSize);
+        }
       }
     }
   }
