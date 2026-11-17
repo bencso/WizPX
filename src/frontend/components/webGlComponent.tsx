@@ -438,8 +438,8 @@ export default function WebGlComponent() {
           !spriteRef.current ||
           !selectedScale ||
           !imageSize ||
-          !box.x ||
-          !box.y ||
+          box.x == null ||
+          box.y == null ||
           !box.height ||
           !box.width ||
           !canvasRef.current
@@ -468,8 +468,9 @@ export default function WebGlComponent() {
         const defaultImageScaleW =
           imageSize.width / workPlaceRef.current?.clientWidth;
 
-        const canvasW = w * defaultImageScaleW;
-        const canvasH = h * defaultImageScaleH;
+        // egész képpontra kerekítve: a lebegőpontos szorzás (pl. 999,9999) fél pixeles csúszást adna a keretben
+        const canvasW = Math.round(w * defaultImageScaleW);
+        const canvasH = Math.round(h * defaultImageScaleH);
 
         textureRef.current = new Texture({
           source: textureRef.current.source,

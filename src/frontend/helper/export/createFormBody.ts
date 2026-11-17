@@ -51,6 +51,9 @@ export async function createFormBody(
     expand_position: expandPosition,
     expand_color: selectedImage.expandBackground ?? "#fff",
     masks_number: masksImages.length,
+    // A preset a forráskép méretét is menti, hogy másik méretű képre alkalmazva átskálázható legyen
+    image_width: selectedImage.dimesions?.width ?? 0,
+    image_height: selectedImage.dimesions?.height ?? 0,
   };
 
   const formData = new FormData();

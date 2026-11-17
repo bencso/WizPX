@@ -96,6 +96,8 @@ async def savePreset(
             preset_data["masks_hald_files_buffers"] = s_masks_hald_files_buffers
 
         if expand_mode == "expand" or expand_mode == "crop":
+            # a módot is menteni kell, különben a betöltő nem tudja, hogy vágás vagy kiterjesztés volt
+            preset_data["expand_mode"] = expand_mode
             preset_data["expand_color"] = expand_color
             preset_data["expand_size"] = expand_size
             preset_data["expand_position"] = expand_position

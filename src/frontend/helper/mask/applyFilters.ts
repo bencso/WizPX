@@ -1,5 +1,5 @@
 import { CustomImage } from "@/interfaces/interface";
-import { Application, Sprite, Texture } from "pixi.js";
+import { Application, Rectangle, Sprite, Texture } from "pixi.js";
 import { RefObject } from "react";
 
 export interface applyFiltersProps {
@@ -28,9 +28,17 @@ export function applyFilters(props: applyFiltersProps) {
     image.renderTextures.length > 0 &&
     spriteRef.current
   ) {
+    // Vágás (crop) esetén a textureRef egy kivágott keretű textúra. A rétegek (maszkok, szűrők) a TELJES
+    // kép koordinátáiban dolgoznak, ezért a láncnak a teljes képből kell indulnia, és csak a végeredményből
+    // szabad kivágni a keretet. Különben a megjelenített sprite a teljes méretű eredménytextúrát kapná.
+    const baseTexture = textureRef.current;
+    const cropFrame = getCropFrame(baseTexture);
+
     let input =
       startIndex === 0
-        ? textureRef.current
+        ? cropFrame && baseTexture
+          ? getFullTexture(baseTexture)
+          : baseTexture
         : image.renderTextures[startIndex - 1].resultTexture;
 
     const layers = image.renderTextures;
@@ -61,7 +69,62 @@ export function applyFilters(props: applyFiltersProps) {
       }
     }
 
-    spriteRef.current.texture = input;
+    // A kijelzett textúra: vágásnál a végeredmény kivágott része, egyébként maga az eredmény
+    spriteRef.current.texture =
+      cropFrame && input ? getCroppedView(input, cropFrame) : input;
     spriteRef.current.filters = [];
   }
+}
+
+// A kivágott keretű textúra kerete, ha a textúra tényleg a forrás egy részét mutatja (különben null)
+function getCropFrame(texture: Texture | null): Rectangle | null {
+  if (!texture) return null;
+
+  const { frame, source } = texture;
+
+  const isCropped =
+    frame.x !== 0 ||
+    frame.y !== 0 ||
+    Math.round(frame.width) !== Math.round(source.width) ||
+    Math.round(frame.height) !== Math.round(source.height);
+
+  return isCropped ? frame.clone() : null;
+}
+
+// Ugyanaz a forrás teljes kerettel. Gyorsítótárazva, hogy ne jöjjön létre minden hívásnál új textúra.
+const fullTextures = new WeakMap<object, Texture>();
+
+function getFullTexture(texture: Texture): Texture {
+  let full = fullTextures.get(texture.source);
+
+  if (!full) {
+    full = new Texture({ source: texture.source });
+    fullTextures.set(texture.source, full);
+  }
+
+  return full;
+}
+
+// Egy eredménytextúra kivágott nézete. A korábbi nézetet felszabadítja (a forrást nem).
+const croppedViews = new WeakMap<object, Texture>();
+
+function getCroppedView(texture: Texture, frame: Rectangle): Texture {
+  const previous = croppedViews.get(texture.source);
+
+  if (
+    previous &&
+    !previous.destroyed &&
+    previous.frame.x === frame.x &&
+    previous.frame.y === frame.y &&
+    previous.frame.width === frame.width &&
+    previous.frame.height === frame.height
+  )
+    return previous;
+
+  previous?.destroy(false);
+
+  const view = new Texture({ source: texture.source, frame });
+  croppedViews.set(texture.source, view);
+
+  return view;
 }

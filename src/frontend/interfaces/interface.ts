@@ -241,7 +241,7 @@ export interface SessionStore {
     id: number,
     blob: ArrayBuffer,
     mimeType?: string,
-  ) => void;
+  ) => Promise<void>;
   clearCopyrightImage: (id: number) => void;
   setCopyrightImagePosition: (
     id: number,
@@ -305,7 +305,7 @@ export interface SessionStore {
     imageId: number,
     text: string,
     referenceElement: RefObject<HTMLCanvasElement | null>,
-  ) => void;
+  ) => string | null;
   deleteText: (imageId: number, textId: string) => void;
   editText: (imageId: number, textId: string, text: string) => void;
   setTextFontSize: (

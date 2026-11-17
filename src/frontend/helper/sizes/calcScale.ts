@@ -77,8 +77,8 @@ export const calcScale = ({
         !box ||
         !spriteRef.current ||
         !imageSize ||
-        !box.x ||
-        !box.y ||
+        box.x == null ||
+        box.y == null ||
         !box.height ||
         !box.width ||
         !canvasRef.current
