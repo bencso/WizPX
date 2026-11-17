@@ -146,14 +146,19 @@ export const useMask = (props: createMaskProps) => {
     const sprite = props.spriteRef.current;
 
     if (!sprite || sprite.scale.x === 0)
-      return { scale: latestRef.current.scale, offsetX: 0, offsetY: 0 };
+      return { scale: latestRef.current.scale, offsetX: 0, offsetY: 0, originX: 0, originY: 0 };
 
     const scale = Math.abs(sprite.scale.x);
+
+    // vágott nézetben a sprite textúrája a teljes kép egy kerete: ennek origója kell
+    const frame = sprite.texture?.frame;
 
     return {
       scale,
       offsetX: sprite.x - sprite.width * sprite.anchor.x,
       offsetY: sprite.y - sprite.height * sprite.anchor.y,
+      originX: frame?.x ?? 0,
+      originY: frame?.y ?? 0,
     };
   }
 
@@ -202,12 +207,12 @@ export const useMask = (props: createMaskProps) => {
 
     const container = batchContainerRef.current;
     const pool = spritePoolRef.current;
-    const { scale, offsetX, offsetY } = getMapping();
+    const { scale, offsetX, offsetY, originX, originY } = getMapping();
     const brushScale = current.brushSize / scale / 100;
 
     const preview = current.temporarySpriteRef.current;
     preview.scale.set(scale);
-    preview.position.set(offsetX, offsetY);
+    preview.position.set(offsetX - originX * scale, offsetY - originY * scale);
     const blendMode = current.maskErase ? "erase" : "normal";
 
     for (let i = 0; i < queue.length; i++) {
@@ -222,8 +227,8 @@ export const useMask = (props: createMaskProps) => {
 
       sprite.texture = current.brushTexture;
       sprite.position.set(
-        (queue[i].x - offsetX) / scale,
-        (queue[i].y - offsetY) / scale,
+        (queue[i].x - offsetX) / scale + originX,
+        (queue[i].y - offsetY) / scale + originY,
       );
       sprite.scale.set(brushScale);
       sprite.blendMode = blendMode;
