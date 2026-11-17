@@ -372,7 +372,11 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
       imageId: number,
       text: string,
       referenceElement: RefObject<HTMLCanvasElement | null>,
-    ) =>
+    ) => {
+
+      const textId = uuidv4();
+      let success = false;
+
       set((state) => {
         const image = state.sessionData.find((img: any) => img.id === imageId);
         const imageScale = Math.min(
@@ -384,8 +388,6 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
 
         if (image) {
           if (!image.texts) image.texts = [];
-
-          const textId = uuidv4();
 
           const newText: DraggableImageEvent = {
             id: textId,
@@ -399,9 +401,18 @@ export const useSessionStore = createWithEqualityFn<SessionStore>()(
             opacity: 100,
           };
 
+          success = true;
+
           image.texts = [...image.texts, newText];
+
         }
-      }),
+      });
+
+      if (success)
+        return textId;
+      else return null
+
+    },
     deleteText: (imageId: number, textId: string) => {
       set((state) => {
         const image = state.sessionData.find((img: any) => img.id === imageId);
