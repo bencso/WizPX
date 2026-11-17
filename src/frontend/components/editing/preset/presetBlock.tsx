@@ -16,7 +16,7 @@ export default function PresetBlock() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { setLut, setBorderSize, addTexts, setTextColor, setTextFontFamily, setTextFontSize, setTextFontWeight,
-    setTextOpacity, setTextPosition, setExpandBackground, setExportFileOptimize, setExportFileExtension, setExpandMode, setExpandSize, setCopyrightImageOpacity, setCopyrightImagePosition, setCopyrightImageSize, saveCopyrightImage } = useSessionStore();
+    setTextOpacity, setTextPosition, setExpandBackground, setExportFileOptimize, setExportFileExtension, setExpandMode, setExpandSize, setCopyrightImageOpacity, setCopyrightImagePosition, setCopyrightImageSize, saveCopyrightImage, setCropBox } = useSessionStore();
   const { selectedImg, imageScale, canvasRef } = useWorkSession();
 
   async function usePreset() {
@@ -77,12 +77,14 @@ export default function PresetBlock() {
 
         const expandMode = data["expand_mode"] ?? "no";
         const expandSize = data["expand_size"] ?? null;
-        const expandPostion = data["expand_position"] ?? null;
         const expandColor = data["expand_color"] ?? null;
+        const expandPosition = data["expand_position"] ?? null;
 
         const copyrightImageOpacity = data["copyright_image_opacity"] ?? null;
         const copyrightImagePosition = data["copyright_image_position"] ?? null;
         const copyrightImageSize = data["copyright_image_size"] ?? null;
+
+        const imageSize = data["imageSize"] ?? null;
 
         const texts = data["texts"] ?? [];
 
@@ -128,8 +130,22 @@ export default function PresetBlock() {
         if (expandMode)
           setExpandMode(selectedImg, expandMode);
         if (expandColor) setExpandBackground(selectedImg, expandColor)
-        if (expandSize) {
-          if (expandPostion) setExpandSize(selectedImg, expandSize, expandPostion);
+
+        if (expandMode === "expand" && expandSize) {
+          if (expandSize.padding) setExpandSize(selectedImg, expandSize, expandSize.padding);
+          else setExpandSize(selectedImg, expandSize);
+        }
+
+        if (expandMode === "crop" && expandSize) {
+          if (expandSize.height && expandSize.width) setCropBox({
+            id: selectedImg,
+            box: {
+              y: expandPosition.y ?? 0,
+              x: expandPosition.x ?? 0,
+              height: expandSize.height ?? 0,
+              width: expandSize.width ?? 0,
+            }
+          });
           else setExpandSize(selectedImg, expandSize);
         }
 

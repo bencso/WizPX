@@ -67,6 +67,8 @@ async def savePreset(
         expand_color = data.get("expand_color") or "#fff"
         expand_position = data.get("expand_position") or None
         masks_number = data.get("masks_number") or 0
+        image_height = data.get("image_height") or 0
+        image_width = data.get("image_width") or 0
 
         masks_files_buffers = []
         s_masks_hald_files_buffers = []
@@ -85,15 +87,15 @@ async def savePreset(
 
         if lut:
             lut_file_bytes = await read_limited(lut)
-            preset_data["lut_file_bytes"] = base64.b64encode(
-                lut_file_bytes
-            ).decode("ascii")
+            preset_data["lut_file_bytes"] = base64.b64encode(lut_file_bytes).decode(
+                "ascii"
+            )
 
         if masks_number > 0:
             preset_data["masks_files_buffers"] = masks_files_buffers
             preset_data["masks_hald_files_buffers"] = s_masks_hald_files_buffers
 
-        if expand_mode != "no" and expand_mode != "border" and expand_mode == "expand":
+        if expand_mode == "expand" or expand_mode == "crop":
             preset_data["expand_color"] = expand_color
             preset_data["expand_size"] = expand_size
             preset_data["expand_position"] = expand_position
@@ -106,8 +108,7 @@ async def savePreset(
             cp_image = await read_limited(copyright_image)
             copyright_image_size = int(data.get("copyright_image_size")) or 0
             copyright_image_position = data.get("copyright_image_position")
-            copyright_image_opacity = float(
-                data.get("copyright_image_opacity")) or 100
+            copyright_image_opacity = float(data.get("copyright_image_opacity")) or 100
             if not copyright_image_position:
                 copyright_image_position = ("LEFT", "TOP")
             else:
@@ -115,8 +116,7 @@ async def savePreset(
                     round(copyright_image_position["x"]),
                     round(copyright_image_position["y"]),
                 )
-            copyright_image_opacity = int(
-                (copyright_image_opacity / 100.0) * 255)
+            copyright_image_opacity = int((copyright_image_opacity / 100.0) * 255)
 
             preset_data["copyright_image"] = cp_image
             preset_data["copyright_image_opacity"] = copyright_image_opacity
@@ -126,13 +126,22 @@ async def savePreset(
         if texts and len(texts) > 0:
             preset_data["texts"] = texts
 
+        if image_height and image_width:
+            preset_data["image_size"] = {"height": image_height, "width": image_width}
+
         preset_data["file_extension"] = file_extension
         preset_data["allowed_infos"] = allowed_infos
         preset_data["optimize"] = optimize
 
         prest_id_generator = URLSafeSerializer("presetwizpx")
-        preset_id = prest_id_generator.dumps(json.dumps(preset_data, default=lambda x: base64.b64encode(
-            x).decode("ascii") if isinstance(x, bytes) else x))
+        preset_id = prest_id_generator.dumps(
+            json.dumps(
+                preset_data,
+                default=lambda x: (
+                    base64.b64encode(x).decode("ascii") if isinstance(x, bytes) else x
+                ),
+            )
+        )
 
         return JSONResponse(
             status_code=200,
