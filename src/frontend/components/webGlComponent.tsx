@@ -227,7 +227,6 @@ export default function WebGlComponent() {
       return;
     }
 
-    // Gyors képváltásnál egy lassabb, korábbi betöltés ne írja felül az újabbat
     const loadId = ++latestLoad.current;
 
     const img = new Image();
@@ -241,7 +240,6 @@ export default function WebGlComponent() {
 
       overlay.label = "overlayContainer";
 
-      // az előző ideiglenes (kép méretű) textúra felszabadítása, különben minden betöltés újat halmoz fel
       const previousTemporary = temporarySpriteRef.current?.texture;
       if (previousTemporary && previousTemporary !== Texture.EMPTY)
         previousTemporary.destroy(true);
@@ -286,7 +284,6 @@ export default function WebGlComponent() {
       updateLayout();
       setSelectLayer(0);
 
-      // az új overlay container üres: a szövegeket és az overlay képet újra ki kell rajzolni
       setOverlayVersion((version) => version + 1);
     };
 
@@ -300,7 +297,6 @@ export default function WebGlComponent() {
     const container = new Container();
     filtersRef.current = container;
 
-    // Képváltáskor az új képet be kell tölteni (a legelső betöltést a mount effekt végzi, ott az app még nincs kész)
     if (appRef.current) loadImage();
 
     return () => {
@@ -468,7 +464,6 @@ export default function WebGlComponent() {
         const defaultImageScaleW =
           imageSize.width / workPlaceRef.current?.clientWidth;
 
-        // egész képpontra kerekítve: a lebegőpontos szorzás (pl. 999,9999) fél pixeles csúszást adna a keretben
         const canvasW = Math.round(w * defaultImageScaleW);
         const canvasH = Math.round(h * defaultImageScaleH);
 

@@ -821,7 +821,6 @@ const sidebarElements = (
 
 export default function SideBar() {
   //#region contextek
-
   const {
     spriteRef,
     selectedImg,
@@ -832,8 +831,6 @@ export default function SideBar() {
     selectedLayer,
   } = useWorkSession();
 
-  // Szelektoros feliratkozás: a műveletek stabil referenciák, így a menü nem renderel újra
-  // minden store-írásra, csak akkor, ha a kiválasztott kép vagy a szűrői változnak
   const editFilters = useSessionStore((s) => s.editFilters);
   const getFilterValue = useSessionStore((s) => s.getFilterValue);
   const setExpandMode = useSessionStore((s) => s.setExpandMode);

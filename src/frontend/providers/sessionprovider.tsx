@@ -40,7 +40,6 @@ export function WorkSessionProvider({ children }: WorkSessionProviderProps) {
   );
 
   const [appIsReady, setIsAppReady] = useState<boolean>(false);
-  // Minden képbetöltés után nő: ilyenkor új overlay container jön létre, a szövegeket / overlay képet újra kell rajzolni
   const [overlayVersion, setOverlayVersion] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 

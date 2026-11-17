@@ -31,7 +31,6 @@ export default function Page() {
 
   const path = usePathname();
 
-  // Ellenőrizzük, hogy az editor oldalon vagyunk-e
   const isEditor = path === "/";
   //#endregion
 

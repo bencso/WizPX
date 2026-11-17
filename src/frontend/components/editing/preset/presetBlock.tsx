@@ -81,7 +81,6 @@ export default function PresetBlock() {
 
       if (!data) return;
 
-      // Az aktuális kép adatai: a preset pozíciói és méretei a forráskép méretében vannak megadva
       const getImage = () =>
         useSessionStore.getState().sessionData.find((si) => si.id === selectedImg);
       const targetSize = getImage()?.dimesions;
@@ -106,7 +105,7 @@ export default function PresetBlock() {
       );
       const copyrightImageSize = data["copyright_image_size"] ?? null;
 
-      // A preset mentésekor a forráskép mérete (a régi presetekben nincs: ilyenkor nem skálázunk)
+
       const scale = getPresetScale(expandMode, data["image_size"], targetSize);
 
       const texts = data["texts"] ?? [];
@@ -138,7 +137,6 @@ export default function PresetBlock() {
           if (textPosition && (textPosition.x || textPosition.y))
             setTextPosition(selectedImg, newId, scalePoint(textPosition, scale), 1);
 
-          // A relatív pozíció (pl. jobb alsó sarok) a cél kép méretéhez igazodik, nem kell skálázni
           if (text.relativePosition)
             setTextRelativePosition(selectedImg, newId, text.relativePosition);
         });
@@ -156,7 +154,6 @@ export default function PresetBlock() {
 
       if (exportFileExt) setExportFileExtension(selectedImg, exportFileExt);
 
-      // Az üzemmód: a backend csak az expand / crop módot menti, a keretet a méretéből ismerjük fel
       if (expandMode === "expand" || expandMode === "crop")
         setExpandMode(selectedImg, expandMode);
       else setExpandMode(selectedImg, borderSize > 0 ? "border" : "no");
@@ -164,7 +161,6 @@ export default function PresetBlock() {
       if (expandColor) setExpandBackground(selectedImg, expandColor);
 
       if (expandMode === "expand" && expandSize) {
-        // az expand méret a kimeneti vászon mérete: független a kép méretétől
         setExpandSize(selectedImg, expandSize, expandSize.padding ?? 0);
       }
 
@@ -182,8 +178,6 @@ export default function PresetBlock() {
           fullImage,
         );
 
-        // A currentWidth / currentHeight nélkül a vágás méretét rosszul számolja a nézet, ezért a
-        // vászon aktuális méretét is át kell adni (ahogy a vágókeret húzásakor is megy)
         setCropBox({
           id: selectedImg,
           box: {
@@ -193,14 +187,12 @@ export default function PresetBlock() {
           },
         });
 
-        // A vágás mentett állapotban érvényesül (a setCropSave átkapcsolja az állapotot)
         if (!getImage()?.cropSave) setCropSave(selectedImg);
       }
 
       if (copyrightImage) {
         const bytes = base64ToBytes(copyrightImage);
 
-        // a feltöltés aszinkron: be kell várni, különben felülírná a lent beállított értékeket
         await saveCopyrightImage(
           selectedImg,
           bytes.buffer,

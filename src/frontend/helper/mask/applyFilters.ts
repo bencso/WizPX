@@ -28,9 +28,6 @@ export function applyFilters(props: applyFiltersProps) {
     image.renderTextures.length > 0 &&
     spriteRef.current
   ) {
-    // Vágás (crop) esetén a textureRef egy kivágott keretű textúra. A rétegek (maszkok, szűrők) a TELJES
-    // kép koordinátáiban dolgoznak, ezért a láncnak a teljes képből kell indulnia, és csak a végeredményből
-    // szabad kivágni a keretet. Különben a megjelenített sprite a teljes méretű eredménytextúrát kapná.
     const baseTexture = textureRef.current;
     const cropFrame = getCropFrame(baseTexture);
 
@@ -69,14 +66,12 @@ export function applyFilters(props: applyFiltersProps) {
       }
     }
 
-    // A kijelzett textúra: vágásnál a végeredmény kivágott része, egyébként maga az eredmény
     spriteRef.current.texture =
       cropFrame && input ? getCroppedView(input, cropFrame) : input;
     spriteRef.current.filters = [];
   }
 }
 
-// A kivágott keretű textúra kerete, ha a textúra tényleg a forrás egy részét mutatja (különben null)
 function getCropFrame(texture: Texture | null): Rectangle | null {
   if (!texture) return null;
 
@@ -91,7 +86,6 @@ function getCropFrame(texture: Texture | null): Rectangle | null {
   return isCropped ? frame.clone() : null;
 }
 
-// Ugyanaz a forrás teljes kerettel. Gyorsítótárazva, hogy ne jöjjön létre minden hívásnál új textúra.
 const fullTextures = new WeakMap<object, Texture>();
 
 function getFullTexture(texture: Texture): Texture {
@@ -105,7 +99,6 @@ function getFullTexture(texture: Texture): Texture {
   return full;
 }
 
-// Egy eredménytextúra kivágott nézete. A korábbi nézetet felszabadítja (a forrást nem).
 const croppedViews = new WeakMap<object, Texture>();
 
 function getCroppedView(texture: Texture, frame: Rectangle): Texture {

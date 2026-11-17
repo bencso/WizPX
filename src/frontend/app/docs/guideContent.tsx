@@ -10,7 +10,6 @@ import {
 import { HiAdjustments } from "react-icons/hi";
 import { TbColorFilter, TbColorSwatch, TbGradienter, TbShadow, TbTemperature } from "react-icons/tb";
 
-// Melyik rétegnél látszik a menüpont: "base" = Kép (0. réteg), "layer" = új (maszkolható) réteg
 export type MenuLayer = "base" | "layer";
 
 export interface MenuGuide {

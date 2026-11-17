@@ -150,7 +150,6 @@ export const useMask = (props: createMaskProps) => {
 
     const scale = Math.abs(sprite.scale.x);
 
-    // vágott nézetben a sprite textúrája a teljes kép egy kerete: ennek origója kell
     const frame = sprite.texture?.frame;
 
     return {
